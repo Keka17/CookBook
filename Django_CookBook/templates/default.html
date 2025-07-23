@@ -1,0 +1,36 @@
+{% load static %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Old Fashioned Cooking{% endblock %}</title>
+     <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap&text=АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя" rel="stylesheet">
+
+    <!-- Кастомные стили -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <!-- Дополнительные стили для конкретных страниц -->
+    {% block extra_css %}{% endblock %}
+
+</head>
+
+
+<body>
+
+    <!-- Навигационная панель -->
+    <nav class="navbar">
+        <div class="navbar-links">
+            {% block navbar %}{% endblock %}
+        </div>
+    </nav>
+
+    <!-- Основное содержимое -->
+    {% block content %}{% endblock %}
+
+
+</body>
+
+

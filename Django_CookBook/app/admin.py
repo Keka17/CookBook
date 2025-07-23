@@ -21,10 +21,15 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'dish_name', 'text', 'author', 'category', 'created_at', 'rating')
+    list_display = ('id', 'dish_name', 'text', 'author', 'category', 'created_at', 'average_rating')
     list_filter = ('category', 'created_at')
     search_fields = ('dish_name', 'description', 'author__email')
     readonly_fields = ('created_at', 'updated_at')
+
+    def average_rating(self, obj):
+        return obj.average_rating()
+
+    average_rating.short_description = 'Средний рейтинг'
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):

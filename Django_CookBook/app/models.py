@@ -1,11 +1,11 @@
 from django.db import models 
 from django.conf import settings
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.urls import reverse
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import User, AbstractUser
 from django_ckeditor_5.fields import CKEditor5Field
-
+from django.db.models import Avg
 
 class Category(models.Model):
     category = models.CharField(max_length=30, unique=True)
@@ -27,25 +27,43 @@ class Recipe(models.Model):
     description = models.CharField(max_length=500, blank=False, null=False,
                                    verbose_name="Описание блюда")
     text = CKEditor5Field(verbose_name="Шаги приготовления")
-    rating = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
     def __str__(self):
         return self.dish_name
 
     def like(self):
-        self.rating += 1
-        self.save()
+        if self.rating < 5:
+            self.rating += 1
+            self.save()
 
     def dislike(self):
-        if self.rating > 0:
+        if self.rating > 1:
             self.rating -= 1
             self.save()
+
+    def average_rating(self):
+        average = self.ratings.aggregate(avg_rating=Avg("rating"))["avg_rating"]
+        return round(average, 1) if average else 0.0
 
     def preview(self):
         return f"{self.description[:100]}..." if len(self.description) > 100 else self.description
 
     def get_absolute_url(self):
         return reverse("recipe_detail", args=[str(self.id)])
+
+
+class RecipeRating(models.Model):
+    """Модель оценки рецепта пользователем"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE,
+                               related_name="ratings")
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
+
+    class Meta:
+        unique_together = ("user", "recipe")  # 1 пользователь - 1 оценка
+
+    def __str__(self):
+        return f"{self.user.email} - {self.recipe.dish_name}: {self.rating}"
     
 
 class UserManager(BaseUserManager):
@@ -87,6 +105,7 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.email
+
 
 
 

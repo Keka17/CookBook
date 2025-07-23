@@ -1,13 +1,53 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from .models import Recipe, User, Category, RecipeRating
+from django.shortcuts import render, get_object_or_404
+from django.views.generic import (ListView, DetailView,
+                                  CreateView, UpdateView, DeleteView, TemplateView)
+from django.db.models import Avg, Count
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
-# class ProductForm(forms.ModelForm):
-#     # Add some custom validation to our image field
-#     def clean_image(self):
-#         image = self.cleaned_data.get('image', False)
-#         if image:
-#             if image._size > 4*1024*1024:
-#                 raise ValidationError("Image file too large ( > 4mb )")
-#             return image
-#         else:
-#             raise ValidationError("Couldn't read uploaded image")
+
+class BestRecipes(ListView):
+    """Страница с лучиши рецептами"""
+    model = Recipe
+    template_name = "best.html"
+    context_object_name = "recipes"
+    paginate_by = 6
+
+    def get_queryset(self):
+        """Фильтрация по категориям"""
+        queryset = super().get_queryset().annotate(
+            average_rating=Avg("ratings__rating"),
+            rating_count=Count("ratings")
+        ).filter(average_rating_gte=4.5).order_by("-average_rating")
+
+        category_id = self.request.GET.get("category")
+        if category_id:
+            queryset = queryset.filter(category__id=category_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """Добавление категорий в контекст для фильтрации"""
+        context = super().get_context_data(**kwargs)
+        context['categories'] = Category.objects.all()
+
+        return context
+
+
+def recipe(request, pk):
+    """Конкретный рецепт"""
+    recipe = get_object_or_404(Recipe, pk=pk)
+    return render(request, "recipe.html",
+                  {"recipe": recipe})
+
+@login_required
+def rate_recipe(request, pk):
+    recipe = get_object_or_404(Recipe, pk=pk)
+    rating_value = int(request.POST.get("rating"))
+    rating_obj, created = RecipeRating.objects.update_or_create(
+        user=request.user, recipe=recipe,
+        defaults={"rating": rating_value}
+    )
+
+    return redirect('recipe', pk=recipe.pk)
