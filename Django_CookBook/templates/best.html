@@ -1,10 +1,172 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'default.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block extra_css %}
+<style>
+
+    .recipe-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        flex: 1;
+    }
+
+    .recipe-card {
+    border: none;
+    border-radius: 10px;
+    background: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .recipe-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .recipe-title {
+        font-style: italic;
+        font-weight: bold;
+        font-size: 20px;
+        color: rgb(118, 0, 2);
+        margin-top: 10px;
+    }
+
+    .recipe-btn {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        text-decoration: none;
+        padding: 5px 10px;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .recipe-btn:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
+    }
+
+   /* Категории в сайдбаре */
+    .category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .category-list li {
+        margin-bottom: 10px;
+    }
+
+    .category-list a {
+        text-decoration: none;
+        color: white;
+        font-size: 20px;
+        font-style: italic;
+        font-weight: bold;
+    }
+
+    .active-category {
+    color: white !important;
+    background-color: #7a160d;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 60px;
+        border-radius: 10px 0 0 10px;
+        height: calc(100vh - 60px);
+        overflow-y: auto;
+    }
+
+</style>
+{% endblock %}
+
+
+{% block navbar %}
+    {% include "includes/navbars/main_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <!-- Основная область с рецептами -->
+    <div class="content-area">
+        <div class="recipe-grid" id="recipe-list">
+            {% for recipe in recipes %}
+            <div class="recipe-card">
+                <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name }}">
+                <div class="recipe-title">{{ recipe.dish_name }}</div>
+                <div class="recipe-rating">Рейтинг: <b>{{ recipe.average_rating }} </b>⭐️</div>
+                <div>{{ recipe.preview }}</div>
+                <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}
+        <div id="pagination" style="display: none;">
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}">Следующая</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Сайдбар с категориями -->
+    <div class="sidebar">
+    <h3>Сортировка по категориям</h3>
+    <ul class="category-list">
+        <li>
+            <a href="{% url 'best' %}"
+               class="{% if not request.GET.category %}active-category{% endif %}">
+                Все категории
+            </a>
+        </li>
+        {% for category in categories %}
+        <li>
+            <a href="{% url 'best' %}?category={{ category.id }}"
+               class="{% if request.GET.category|default:'' == category.id|stringformat:'s' %}active-category{% endif %}">
+                {{ category.category }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+</div>
+
+<script>
+    // Подгрузка рецептов при скролле вниз
+    let loading = false;
+    window.addEventListener('scroll', function() {
+        if (!loading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+            const nextPage = document.querySelector('#pagination a');
+            if (nextPage) {
+                loading = true;
+                fetch(nextPage.href)
+                    .then(response => response.text())
+                    .then(data => {
+                        const parser = new DOMParser();
+                        const htmlDoc = parser.parseFromString(data, 'text/html');
+                        const newRecipes = htmlDoc.querySelector('#recipe-list').innerHTML;
+                        document.querySelector('#recipe-list').innerHTML += newRecipes;
+
+                        const newPagination = htmlDoc.querySelector('#pagination').innerHTML;
+                        document.querySelector('#pagination').innerHTML = newPagination;
+
+                        loading = false;
+                    });
+            }
+        }
+    });
+</script>
+{% endblock %}

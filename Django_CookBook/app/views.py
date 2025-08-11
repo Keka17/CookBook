@@ -19,7 +19,8 @@ class BestRecipes(ListView):
         queryset = super().get_queryset().annotate(
             average_rating=Avg("ratings__rating"),
             rating_count=Count("ratings")
-        ).filter(average_rating_gte=4.5).order_by("-average_rating")
+        ).filter(
+            average_rating__gte=4.7).order_by("-average_rating")
 
         category_id = self.request.GET.get("category")
         if category_id:
@@ -31,7 +32,6 @@ class BestRecipes(ListView):
         """Добавление категорий в контекст для фильтрации"""
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.all()
-
         return context
 
 

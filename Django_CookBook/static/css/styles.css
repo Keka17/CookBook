@@ -1,6 +1,8 @@
 /* Основные настройки */
 body {
     font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    font-style: normal;
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -45,6 +47,7 @@ body {
     text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
 }
 
+
 /* Основной контент */
 .main-content {
     display: flex;
@@ -61,15 +64,16 @@ body {
 
 /* Боковая панель */
 .sidebar {
-    width: 250px;
+    width: 200px;
     background-color: #D2B48C;
     padding: 20px;
     box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
-    font-family: 'Montserrat', sans-serif;
 }
+
 
 /* Адаптивность под мобильные устройства */
 @media (max-width: 768px) {
+
     .navbar {
         flex-direction: column;
         align-items: center;
@@ -84,5 +88,4 @@ body {
 
 
 /* Загрузка шрифтов */
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap&text=АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюя');

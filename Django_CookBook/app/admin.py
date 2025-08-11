@@ -1,6 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Recipe, Category
+from .models import User, Recipe, RecipeRating, Category
+
+
+class RecipeRatingInline(admin.TabularInline):
+    model = RecipeRating
+    extra = 1
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -25,6 +30,7 @@ class RecipeAdmin(admin.ModelAdmin):
     list_filter = ('category', 'created_at')
     search_fields = ('dish_name', 'description', 'author__email')
     readonly_fields = ('created_at', 'updated_at')
+    inlines = [RecipeRatingInline]
 
     def average_rating(self, obj):
         return obj.average_rating()
