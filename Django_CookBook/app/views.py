@@ -38,8 +38,22 @@ class BestRecipes(ListView):
 def recipe(request, pk):
     """Конкретный рецепт"""
     recipe = get_object_or_404(Recipe, pk=pk)
-    return render(request, "recipe.html",
-                  {"recipe": recipe})
+
+    user_rating = None
+    if request.user.is_authenticated:
+        try:
+            rating_obj = RecipeRating.objects.get(user=request.user, recipe=recipe)
+            user_rating = int(rating_obj.rating) if rating_obj else None
+
+        except RecipeRating.DoesNotExist:
+            pass
+
+    context = {
+        "recipe": recipe,
+        "user_rating": user_rating,
+    }
+
+    return render(request, "recipe.html", context)
 
 @login_required
 def rate_recipe(request, pk):
@@ -50,4 +64,4 @@ def rate_recipe(request, pk):
         defaults={"rating": rating_value}
     )
 
-    return redirect('recipe', pk=recipe.pk)
+    return redirect('recipe_detail', pk=recipe.pk)
