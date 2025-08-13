@@ -64,6 +64,18 @@ class RecipeRating(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - {self.recipe.dish_name}: {self.rating}"
+
+class Favorite(models.Model):
+    """Модель сохраненного пользователем рецепта"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("user", "recipe")  # 1 пользователь - 1 сохранение
+
+    def __str__(self):
+        return f"{self.user} → {self.recipe}"
     
 
 class UserManager(BaseUserManager):

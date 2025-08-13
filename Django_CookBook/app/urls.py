@@ -1,13 +1,14 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import BestRecipes, SearchRecipes, recipe, rate_recipe
+from .views import BestRecipes, SearchRecipes, recipe, rate_recipe, add_to_favorites
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="main.html"), name="main"),
     path("best", BestRecipes.as_view(), name="best"),
     path("recipe/<int:pk>", recipe, name="recipe_detail"),
     path("recipe/<int:pk>/rate/", rate_recipe, name="rate_recipe"),
+    path("recipe/<int:pk>/toggle/", add_to_favorites, name='add_to_favorites'),
     path("search", SearchRecipes.as_view(), name="recipe_search")
 
 ]

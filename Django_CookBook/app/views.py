@@ -1,12 +1,12 @@
 
 from django.shortcuts import render, redirect
-from .models import Recipe, User, Category, RecipeRating
+from .models import Recipe, User, Category, RecipeRating, Favorite
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView,
                                   CreateView, UpdateView, DeleteView, TemplateView)
 from django.db.models import Avg, Count
 from django.contrib.auth.decorators import login_required
-from django.db.models.functions import Lower
+from django.http import JsonResponse
 
 
 class BestRecipes(ListView):
@@ -84,6 +84,7 @@ def recipe(request, pk):
     recipe = get_object_or_404(Recipe, pk=pk)  # Безопасное извлечение объекта
 
     user_rating = None
+    is_favorite = False
 
     # Провека авторизациид для показа оценки
     if request.user.is_authenticated:
@@ -93,9 +94,13 @@ def recipe(request, pk):
         except RecipeRating.DoesNotExist:
             pass
 
+        # Проверка факта сохранения в Избранном
+        is_favorite = Favorite.objects.filter(user=request.user, recipe=recipe).exists()
+
     context = {
         "recipe": recipe,
         "user_rating": user_rating,  # Оценка текущего пользователя
+        "is_favorite": is_favorite,  # Передача в шаблон
     }
 
     return render(request, "recipe.html", context)
@@ -117,3 +122,21 @@ def rate_recipe(request, pk):
 
     # Перенаправление на страницу рецепта
     return redirect('recipe_detail', pk=recipe.pk)
+
+@login_required
+def add_to_favorites(request, pk):
+    """Обработка AJAX-запроса для добавления/удаления рецепта из изрбанного
+    с проверкой на авторизованность"""
+    recipe = get_object_or_404(Recipe, pk=pk)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
+
+    if not created:
+        favorite.delete()  # Удаление из избранного, если ранее добавлен
+        return JsonResponse({"status": "removed"})
+    else:
+        # Добавлен в избранное
+        return JsonResponse({"status": "added"})
+
+
+
+
