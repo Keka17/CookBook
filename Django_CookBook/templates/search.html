@@ -1,0 +1,287 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .search-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 0;
+
+    }
+
+    .search-form {
+        display: flex;
+        gap: 10px;
+        width: 50%;
+        margin-bottom: 20px;
+    }
+
+    .search-form input {
+        flex: 1;
+        padding: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 15px;
+    }
+
+    .search-form button {
+        background-color: rgb(118, 0, 2);
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: default;
+        font-size: 15px;
+    }
+
+    .search-form button:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
+    }
+
+    .main-content {
+        display: flex;
+        gap: 0;
+        margin-top: 0;
+    }
+
+    .sidebar {
+        position: sticky;
+        top: 0;
+        border-radius: 10px 0 0 10px;
+        height: 100vh ;
+        overflow-y: auto;
+    }
+
+    .no-results {
+        margin-top: 40px;
+        text-align: center;
+        font-style: italic;
+        color: #777;
+        grid-column: 1 / -1;
+    }
+
+    .category-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .category-list li {
+        margin-bottom: 10px;
+    }
+
+    .category-list a {
+        text-decoration: none;
+        color: white;
+        font-size: 20px;
+        font-style: italic;
+        font-weight: bold;
+    }
+
+    .active-category {
+    color: white !important;
+    background-color: #7a160d;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+    .recipe-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        flex: 1;
+    }
+
+    .recipe-card {
+    border: none;
+    border-radius: 10px;
+    background: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .recipe-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    }
+
+    .recipe-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .recipe-title {
+        font-style: italic;
+        font-weight: bold;
+        font-size: 20px;
+        color: rgb(118, 0, 2);
+        margin-top: 10px;
+
+    }
+
+    .recipe-btn {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        text-decoration: none;
+        padding: 5px 10px;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .recipe-btn:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 30px;
+        grid-column: 1 / -1;
+    }
+
+    .pagination a {
+        color: rgb(118, 0, 2);
+        padding: 8px 16px;
+        text-decoration: none;
+        border: 1px solid #ddd;
+        margin: 0 4px;
+        border-radius: 5px;
+    }
+
+    .pagination a.active {
+        background-color: rgb(118, 0, 2);
+        color: white;
+        border: 1px solid rgb(118, 0, 2);
+    }
+
+    .pagination a:hover:not(.active) {
+        background-color: #ddd;
+    }
+
+
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "includes/navbars/main_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+
+
+<div class="main-content">
+    <div class="content-area">
+
+        <!-- Поисковая строка -->
+        <div class="search-container">
+            <form method="get" action="{% url 'recipe_search' %}" class="search-form">
+            <input type="text" name="q" placeholder="Введите название блюда" value="{{ search_query }}">
+            <button type="submit">Найти</button>
+            </form>
+        </div>
+
+        <!-- Блок с рецептами -->
+        {% if recipes %}
+        <div class="recipe-grid" id="recipe-list">
+            {% for recipe in recipes %}
+            <div class="recipe-card">
+                <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name}}">
+                <div class="recipe-title">{{ recipe.dish_name }}</div>
+                <div class="recipe-rating">Рейтинг: <b>{{ recipe.average_rating }} </b>⭐️</div>
+                <div>{{ recipe.preview }}</div>
+                <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+
+        <div class="no-results">
+            <p>По вашему запросу ничего не найдено.</p>
+        </div>
+        {% endif %}
+
+        <!-- Пагинация -->
+            {% if is_paginated %}
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page=1">Первая</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page={{ page_obj.previous_page_number }}">←</a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item disabled">
+                            <span class="page-link">Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page={{ page_obj.next_page_number }}">→</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link animated-btn" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+    </div>
+
+     <!-- Сайдбар с категориями -->
+    <div class="sidebar">
+        <h3>Сортировка по категориям</h3>
+        <ul class="category-list">
+            <li>
+                <a href="{% url 'recipe_search' %}"
+                   class="{% if not request.GET.category %}active-category{% endif %}">
+                    Все категории
+                </a>
+            </li>
+            {% for category in categories %}
+            <li>
+                <a href="{% url 'recipe_search' %}?category={{ category.id }}"
+                   class="{% if request.GET.category|default:'' == category.id|stringformat:'s' %}active-category{% endif %}">
+                    {{ category.category }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<script>
+    // Подгрузка рецептов при скролле вниз
+    let loading = false;
+    window.addEventListener('scroll', function() {
+        if (!loading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
+            const nextPage = document.querySelector('#pagination a');
+            if (nextPage) {
+                loading = true;
+                fetch(nextPage.href)
+                    .then(response => response.text())
+                    .then(data => {
+                        const parser = new DOMParser();
+                        const htmlDoc = parser.parseFromString(data, 'text/html');
+                        const newRecipes = htmlDoc.querySelector('#recipe-list').innerHTML;
+                        document.querySelector('#recipe-list').innerHTML += newRecipes;
+
+                        const newPagination = htmlDoc.querySelector('#pagination').innerHTML;
+                        document.querySelector('#pagination').innerHTML = newPagination;
+
+                        loading = false;
+                    });
+            }
+        }
+    });
+</script>
+{% endblock %}
