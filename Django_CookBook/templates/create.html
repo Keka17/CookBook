@@ -1,0 +1,340 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .create-container {
+        display: flex;
+        background-color: #fbeedc;
+        padding: 20px;
+        gap: 20px;
+    }
+
+    .create-left {
+        width: 40%;
+        margin-left: 30px;
+    }
+
+    .create-left img {
+        max-width: 70%;
+        height: auto;
+    }
+
+    .create-rules {
+        font-size: 16px;
+        line-height: 1.5;
+        padding: 20px;
+        border: 1px solid #a77b5d;
+        background-color: #fff9f0;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .create-rules em {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 20px;
+        color: rgb(118, 0, 2);
+    }
+
+    .create-right {
+        width: 50%;
+        background-color: #fdf5e6;
+        padding: 20px;
+        border: 1px solid #a77b5d;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .create-right h2 {
+        text-align: center;
+        color: #7b0000;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 30px;
+    }
+
+    label {
+        font-weight: bold;
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    /* Единый стиль подсказок и placeholder */
+    ::placeholder,
+    .helptext {
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+        color: #888;
+        opacity: 1;
+    }
+
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #a77b5d;
+        border-radius: 4px;
+        background-color: #fff9f0;
+    }
+
+    /* Увеличенные поля */
+    #id_dish_name {
+        height: 50px;
+        font-size: 18px;
+    }
+
+    #id_description {
+        min-height: 120px;
+        font-size: 16px;
+    }
+
+    /* Стили для CKEditor5 */
+    .ck-editor {
+    width: 100% !important;
+    }
+
+    .ck-editor__editable {
+    min-height: 300px !important;
+    background-color: #fff9f0 !important;
+    border: 1px solid #a77b5d !important;
+    }
+
+    .btn-submit {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-size: 18px;
+        font-weight: bold;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: #fff9f0;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+
+
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "includes/navbars/main_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="create-container">
+    <!-- Левая колонка с рекомендациями и картинкой -->
+    <div class="create-left">
+        <img src="{% static 'pictures/create_bree.png' %}" alt="Бри с ружьем">
+        <div class="create-rules">
+            <p>Чтобы ваш рецепт выглядел <strong><em>безупречно</em></strong>, следуйте этим правилам:</p>
+            <ol>
+                <li>Описание - лаконичное и красивое</li>
+                <li>Ингредиенты по порядку</li>
+                <li>Пошаговое приготовление</li>
+                <li>Фото блюда в теплых тонах</li>
+            </ol>
+        </div>
+    </div>
+
+    <!-- Правая колонка с формой создания рецепта и обработкой ошибок -->
+    <div class="create-right">
+        <h2><i>Форма добавления рецепта</i></h2>
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+            {{ form.media }}
+
+            <!-- Общие ошибки формы -->
+             <div class="form-group">
+    {{ form.dish_name.label_tag }}
+    {{ form.dish_name }}
+    <div class="live-error"></div>
+</div>
+
+<div class="form-group">
+    {{ form.picture.label_tag }}
+    {{ form.picture }}
+    <div class="live-error"></div>
+</div>
+
+<div class="form-group">
+    {{ form.category.label_tag }}
+    {{ form.category }}
+    <div class="live-error"></div>
+</div>
+
+<div class="form-group">
+    {{ form.description.label_tag }}
+    {{ form.description }}
+    <div class="live-error"></div>
+</div>
+
+<div class="form-group">
+    {{ form.text.label_tag }}
+    {{ form.text }}
+    <div class="live-error"></div>
+</div>
+
+            <div style="text-align: center;">
+                <button type="submit" class="btn-submit">Опубликовать рецепт</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Динамическая валидация -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const form = document.querySelector("form");
+    const fields = document.querySelectorAll(".form-control");
+
+    // ----- Placeholder скрытие -----
+    fields.forEach(field => {
+        const placeholder = field.getAttribute("placeholder");
+        field.addEventListener("focus", () => field.setAttribute("placeholder", ""));
+        field.addEventListener("blur", () => {
+            if (!field.value.trim()) {
+                field.setAttribute("placeholder", placeholder);
+            }
+        });
+    });
+
+    // ----- Проверка и вывод ошибки -----
+    function showError(input, message) {
+        const errorDiv = input.closest(".form-group").querySelector(".live-error");
+        errorDiv.textContent = message || "";
+        errorDiv.style.color = message ? "red" : "";
+    }
+
+    // ----- Поля -----
+    const dishName = document.querySelector("#id_dish_name");
+    const description = document.querySelector("#id_description");
+    const picture = document.querySelector("#id_picture");
+    const category = document.querySelector("#id_category");
+    const textInput = document.querySelector("#id_text");
+
+    // ----- Функции проверки -----
+    function validateDishName() {
+    const v = dishName.value.trim();
+    const firstChar = v.charAt(0);
+
+    if (!v) {
+        showError(dishName, "Введите название блюда.");
+        return false;
+    }
+    // проверка, что первый символ — буква
+    else if (!/^[A-ZА-ЯЁ]$/i.test(firstChar)) {
+        showError(dishName, "Название должно начинаться с буквы.");
+        return false;
+    }
+    // проверка на заглавную букву
+    else if (firstChar !== firstChar.toUpperCase()) {
+        showError(dishName, "Первая буква должна быть заглавной.");
+        return false;
+    }
+
+    showError(dishName, "");
+    return true;
+}
+
+
+    function validateDescription() {
+        const v = description.value.trim();
+        const firstChar = v.charAt(0);
+
+        if (!v) {
+            showError(description, "Введите описание блюда.");
+            return false;
+        }
+
+        // проверка, что первый символ — буква
+        else if (!/^[A-ZА-ЯЁ]$/i.test(firstChar)) {
+            showError(description, "Название должно начинаться с буквы.");
+            return false;
+        }
+        // проверка на заглавную букву
+        else if (firstChar !== firstChar.toUpperCase()) {
+            showError(description, "Первая буква должна быть заглавной.");
+            return false;
+        }
+
+        showError(dishName, "");
+        return true;
+    }
+
+    function validatePicture() {
+        const file = picture.files[0];
+        if (!file) {
+            showError(picture, "Загрузите изображение.");
+            return false;
+        } else if (file.size > 1024 * 1024) {
+            showError(picture, "Размер изображения не должен превышать 1 МБ.");
+            return false;
+        }
+        showError(picture, "");
+        return true;
+    }
+
+    function validateCategory() {
+        if (!category.value) {
+            showError(category, "Выберите категорию блюда.");
+            return false;
+        }
+        showError(category, "");
+        return true;
+    }
+
+    function validateText() {
+        let v = "";
+        if (window.CKEDITOR && CKEDITOR.instances['id_text']) {
+            v = CKEDITOR.instances['id_text'].getData().replace(/<[^>]*>/g, "").trim();
+        } else if (textInput) {
+            v = textInput.value.trim();
+        }
+        if (!v) {
+            showError(textInput, "Введите шаги приготовления.");
+            return false;
+        }
+        showError(textInput, "");
+        return true;
+    }
+
+    // ----- Live-проверки -----
+    dishName.addEventListener("input", validateDishName);
+    description.addEventListener("input", validateDescription);
+    picture.addEventListener("change", validatePicture);
+    category.addEventListener("change", validateCategory);
+    if (window.CKEDITOR && CKEDITOR.instances['id_text']) {
+        CKEDITOR.instances['id_text'].on('change', validateText);
+    } else if (textInput) {
+        textInput.addEventListener("input", validateText);
+    }
+
+    // ----- Проверка перед отправкой -----
+    form.addEventListener("submit", function(e) {
+        let valid = true;
+        if (!validateDishName()) valid = false;
+        if (!validatePicture()) valid = false;
+        if (!validateCategory()) valid = false;
+        if (!validateDescription()) valid = false;
+        if (!validateText()) valid = false;
+
+        if (!valid) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    });
+});
+</script>
+
+{% endblock %}

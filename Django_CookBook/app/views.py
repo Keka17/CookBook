@@ -1,12 +1,17 @@
+from audioop import reverse
 
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+
 from .models import Recipe, User, Category, RecipeRating, Favorite
+from .forms import RecipeForm
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView,
                                   CreateView, UpdateView, DeleteView, TemplateView)
 from django.db.models import Avg, Count
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class BestRecipes(ListView):
@@ -41,7 +46,7 @@ class BestRecipes(ListView):
         return context
 
 
-class SearchRecipes(ListView):
+class SearchRecipe(ListView):
     """Класс поиска рецептов"""
     model = Recipe
     template_name = "search.html"
@@ -76,6 +81,20 @@ class SearchRecipes(ListView):
         context['selected_category'] = self.request.GET.get('category', '')
 
         return context
+
+class CreateRecipe(LoginRequiredMixin, CreateView):
+    """Создание рецепта авторизованным пользователем"""
+    model = Recipe
+    form_class = RecipeForm
+    template_name = "create.html"
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user  # Автоматическое добавление автора
+        return super().form_valid(form)
+
+    # Перенаправление на созданный рецепт
+    def get_success_url(self):
+        return reverse_lazy("recipe_detail", kwargs={"pk": self.object.pk})  # Перенаправление на созданный рецепт
 
 
 def recipe(request, pk):
