@@ -30,7 +30,7 @@ class BestRecipes(ListView):
             average_rating=Avg("ratings__rating"),
             rating_count=Count("ratings")
         ).filter(
-            average_rating__gte=4.7).order_by("-average_rating")
+            average_rating__gte=4.7).order_by("-created_at")
 
         # Фильтрацию по категориям через GET-запрос
         category_id = self.request.GET.get("category")
@@ -56,7 +56,7 @@ class SearchRecipe(ListView):
     def get_queryset(self):
         """Функция возвращает queryset рецептов, отфильтрованных по
         названию блюда и категории (выбор через sidebar)"""
-        queryset = Recipe.objects.all()
+        queryset = Recipe.objects.all().order_by('-created_at')
 
         # Получение данных из GET-запроса
         query = self.request.GET.get("q", "").strip()  # Удаление пробелов в поисковом запросе
@@ -157,5 +157,31 @@ def add_to_favorites(request, pk):
         return JsonResponse({"status": "added"})
 
 
+class UserProfileView(DetailView):
+    """Публичный профиль пользователя с возможностью
+    фильтрации опубликованных рецептов по категориям"""
+    model = User
+    template_name = "user_profile.html"
+    context_object_name = "user"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Все рецепты пользователя
+        recipes_qs = Recipe.objects.filter(author=self.object).order_by("-created_at")
+
+        # Фильтрацию по категориям через GET-запрос
+        category_id = self.request.GET.get("category")
+        if category_id:
+            recipes_qs = recipes_qs.filter(category__id=category_id)
+            context["current_category"] = Category.objects.get(pk=category_id)
+        else:
+            context["current_category"] = None
+
+        context["recipes"] = recipes_qs
+
+        # Список всех категорий (sidbar)
+        context["categories"] = Category.objects.all()
+
+        return context
 
