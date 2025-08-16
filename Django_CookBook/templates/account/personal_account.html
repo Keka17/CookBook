@@ -1,0 +1,225 @@
+{% extends 'default.html' %}
+{% load static %}
+
+
+{% block extra_css %}
+<style>
+  .account-container {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 30px;
+        height: calc(100vh - 60px);
+        background-color: #f2ead7;
+        padding: 30px 30px 30px 30px;
+        margin-bottom: 40px;
+        align-items: start;
+  }
+
+  .account-left {
+      display: flex;
+      height: auto;
+      flex-direction: column;
+      align-items: center;
+      background: #fcf8eb;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .account-img {
+        width: 100%;
+        max-width: 250px;
+        height: auto;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+  }
+
+  .account-info {
+        text-align: center;
+        font-size: 16px;
+        line-height: 1.5;
+        margin-top: 10px;
+  }
+
+  .account-nickname {
+        font-family: 'Playfair Display', serif;
+        font-weight: bold;
+        font-size: 20px;
+        color: rgb(118, 0, 2);
+        margin-bottom: 10px;
+  }
+
+  .account-right {
+        margin-top: -25px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 25px 0 15px;
+    gap: 15px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: bold;
+    color: rgb(118, 0, 2);
+    font-size: 22px;
+    white-space: nowrap; /* Запрещаем перенос текста */
+    flex-shrink: 0;
+  }
+
+  .see-all-btn {
+        font-family: 'Roboto', sans-serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 18px;
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        text-decoration: none;
+        padding: 0px 10px;
+        margin-left: 450px;
+        transition: transform 0.3s ease,
+        text-shadow 0.3s ease;
+        white-space: nowrap;
+  }
+
+  .see-all-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
+    }
+
+
+  .recipe-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+        min-height: 200px;
+        position: relative;
+  }
+
+  .recipe-card {
+        background: white;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .recipe-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  }
+
+  .recipe-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 8px;
+  }
+
+  .recipe-title {
+        font-weight: bold;
+        font-size: 18px;
+        font-style: italic;
+        color: rgb(118, 0, 2);
+        margin-top: 10px;
+  }
+
+  .recipe-btn {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 14px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+  }
+
+  .recipe-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+  }
+
+  .empty-message {
+        grid-column: 1 / -1;
+        text-align: center;
+        align-self: center;
+        justify-self: center;
+        font-style: italic;
+        color: gray;
+        font-size: 18px;
+        padding: 40px 0;
+  }
+</style>
+
+{% endblock %}
+
+{% block navbar %}
+    {% include "includes/navbars/account_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="account-container">
+  <!-- Левая колонка -->
+    <div class="account-left">
+      <img src="{{ profile_user.avatar.url }}" alt="Аватар" class="account-img">
+      <div class="account-info">
+        <p><strong>Никнейм:</strong> <i class="account-nickname">{{ profile_user.nickname }}</i></p>
+        <p><strong>На сайте с:</strong> {{ profile_user.date_joined|date:"d.m.Y." }}</p>
+        <p><strong>Опубликовано рецептов:</strong> {{ profile_user.recipe_set.count }}</p>
+      </div>
+    </div>
+
+  <!-- Правая колонка -->
+   <div class="account-right">
+
+     <div class="section-header">
+       <span class="section-title">Избранные рецепты</span>
+         {% if favorite_recipes %}
+            <a href="{% url 'favorite_recipes' profile_user.nickname %}" class="see-all-btn">Смотреть все</a>
+         {% endif %}
+     </div>
+
+     <div class="recipe-grid">
+       {% for recipe in favorite_recipes %}
+        <div class="recipe-card">
+          <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name }}">
+          <div class="recipe-title">{{ recipe.dish_name }}</div>
+          <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
+        </div>
+       {% empty %}
+          <p class="empty-message">Нет избранных рецептов.</p>
+       {% endfor %}
+     </div>
+
+
+    <div class="section-header">
+       <span class="section-title">Мои рецепты</span>
+        {% if favorite_recipes %}
+            <a href="#" class="see-all-btn">Смотреть все</a>
+        {% endif %}
+    </div>
+
+     <div class="recipe-grid">
+       {% for recipe in my_recipes %}
+        <div class="recipe-card">
+          <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name }}">
+          <div class="recipe-title">{{ recipe.dish_name }}</div>
+          <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
+        </div>
+       {% empty %}
+          <p class="empty-message">Пока нет опубликованных рецептов.</p>
+       {% endfor %}
+     </div>
+   </div>
+</div>
+{% endblock %}

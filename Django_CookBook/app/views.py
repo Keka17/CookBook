@@ -1,4 +1,5 @@
 from audioop import reverse
+from lib2to3.fixes.fix_input import context
 
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -184,4 +185,63 @@ class UserProfileView(DetailView):
         context["categories"] = Category.objects.all()
 
         return context
+
+
+def profile_view(request, nickname):
+    """"Личный кабинет пользователя"""
+    profile_user = get_object_or_404(User, nickname=nickname)
+
+    # Опубликованные пользователем рецепты (последние 4)
+    my_recipes = Recipe.objects.filter(author=profile_user).order_by("-created_at")[:4]
+
+    # Избранные рецепты (последние 4)
+    favorite_recipes = Recipe.objects.filter(
+        favorite__user=profile_user).order_by("-favorite__created_at")[:4]
+
+    context = {
+        "profile_user": profile_user,
+        "my_recipes": my_recipes,
+        "favorite_recipes": favorite_recipes,
+    }
+
+    return render(request, "account/personal_account.html", context)
+
+class FavoritesListView(ListView):
+    """Избранные рецепты пользователя с фильтрацией по категориям"""
+    model = Recipe
+    template_name = "account/favorites.html"
+    context_object_name = "recipes"
+    paginate_by = 8
+
+    def get_queryset(self):
+        """Выбор избранных рецептов с фильтрацией по категориям"""
+        nickname = self.kwargs.get("nickname")
+        profile_user = get_object_or_404(User, nickname=nickname)
+
+        # Все сохраненные рецепты
+        queryset = Recipe.objects.filter(
+            favorite__user=profile_user).order_by("-favorite__created_at")
+
+        # Фильтрацию по категориям через GET-запрос
+        category_id = self.request.GET.get("category")
+        if category_id:
+            queryset = queryset.filter(category__id=category_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """Добавление в контекст категорий и владельца профиля"""
+        context = super().get_context_data(**kwargs)
+        nickname = self.kwargs.get("nickname")
+        profile_user = get_object_or_404(User, nickname=nickname)
+
+        context["categories"] = Category.objects.all()
+        context["profile_user"] = profile_user
+        return context
+
+
+
+
+
+
 

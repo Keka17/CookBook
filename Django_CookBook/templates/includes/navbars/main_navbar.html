@@ -3,6 +3,6 @@
         <a href="{% url 'best' %}" class="nav-link">Лучшие рецепты</a>
         <a href="{% url 'create_recipe' %}" class="nav-link">Добавить рецепт</a>
         <a href="{% url 'recipe_search' %}" class="nav-link">Поиск</a>
-        <a href="#" class="nav-link">Личный кабинет</a>
+        <a href="{% url 'account' nickname=request.user.nickname %}" class="nav-link">Личный кабинет</a>
     </div>
 </div>

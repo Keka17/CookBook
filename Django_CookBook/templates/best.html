@@ -88,6 +88,11 @@
         overflow-y: auto;
     }
 
+    .sidebar-title {
+        color: #2E2E2E;
+        font-style: italic;
+    }
+
     .pagination {
         display: flex;
         justify-content: center;
@@ -207,7 +212,7 @@
 
     <!-- Сайдбар с категориями -->
     <div class="sidebar">
-    <h3>Сортировка по категориям</h3>
+    <h3 class="sidebar-title">Сортировка по категориям</h3>
     <ul class="category-list">
         <li>
             <a href="{% url 'best' %}"
