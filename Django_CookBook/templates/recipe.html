@@ -35,6 +35,23 @@
        margin-top: 10px;
     }
 
+    .author-link {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 20px;
+        color: rgb(118, 0, 2);
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        transform-origin: left center;
+    }
+
+    .author-link:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(118, 0, 2, 0.3);
+    }
+
     .recipe-description {
         font-size: 16px;
         line-height: 1.3;
@@ -192,10 +209,9 @@
             </div>
 
             <div class="recipe-info">
-                Автор: <a href="{% url 'user_profile' recipe.author.pk%}"
-            style="font-size: 20px; font-family: 'Playfair Display', serif; font-style: italic;
-                font-weight: bold; color: rgb(118, 0, 2); text-decoration: none; ">
-                {{ recipe.author.nickname }}</a>
+                Автор: <a href="{% url 'user_profile' recipe.author.pk%}" class="author-link">
+                {{ recipe.author.nickname }}
+                </a>
                 <p>Опубликовано <strong>{{ recipe.created_at|date:"d.m.Y" }}</strong></p>
             </div>
         </div>

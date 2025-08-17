@@ -12,7 +12,7 @@ from django.views.generic import (ListView, DetailView,
 from django.db.models import Avg, Count
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 
 class BestRecipes(ListView):
@@ -95,8 +95,53 @@ class CreateRecipe(LoginRequiredMixin, CreateView):
 
     # Перенаправление на созданный рецепт
     def get_success_url(self):
-        return reverse_lazy("recipe_detail", kwargs={"pk": self.object.pk})  # Перенаправление на созданный рецепт
+        return reverse_lazy("recipe_detail", kwargs={"pk": self.object.pk})
 
+
+class UpdateRecipe(UserPassesTestMixin, UpdateView):
+    """Редактирование рецепта только его автором"""
+    model = Recipe
+    form_class = RecipeForm
+    template_name = "create.html"
+
+    # Перенаправление на отредактированный рецепт
+    def get_success_url(self):
+        return reverse_lazy("recipe_detail", kwargs={"pk": self.object.pk})
+
+    def test_func(self):
+        """Проверка, является ли пользователь автором рецепта"""
+        ad = self.get_object()
+        return self.request.user == ad.author
+
+    def get_form(self, form_class=None):
+        """Ограничение на редактируемые поля"""
+        form = super().get_form(form_class)
+
+        # Разрешенные поля
+        allowed_fields = self.request.GET.get(
+            "fields", "description,picture,text").split(",")
+
+        for field_name in list(form.fields.keys()):
+            if field_name not in allowed_fields:
+                form.fields.pop(field_name)
+
+        return form
+
+
+class DeleteRecipe(UserPassesTestMixin, DeleteView):
+    """Удаление рецепта только его автором"""
+    model = Recipe
+    template_name = "recipe_delete.html"
+    success_url = reverse_lazy("my_recipes")
+
+    def test_func(self):
+        """Проверка авторства"""
+        ad = self.get_object()
+        return self.request.user == ad.author
+
+    def get_success_url(self):
+        nickname = self.kwargs.get("nickname")
+        return reverse_lazy("my_recipes", kwargs={"nickname": nickname})
 
 def recipe(request, pk):
     """Конкретный рецепт; авторизованные пользователи
@@ -187,6 +232,7 @@ class UserProfileView(DetailView):
         return context
 
 
+@login_required
 def profile_view(request, nickname):
     """"Личный кабинет пользователя"""
     profile_user = get_object_or_404(User, nickname=nickname)
@@ -205,6 +251,7 @@ def profile_view(request, nickname):
     }
 
     return render(request, "account/personal_account.html", context)
+
 
 class FavoritesListView(ListView):
     """Избранные рецепты пользователя с фильтрацией по категориям"""
@@ -239,7 +286,37 @@ class FavoritesListView(ListView):
         context["profile_user"] = profile_user
         return context
 
+class MyRecipesListView(ListView):
+    """Опубликованные рецепты пользователя с фильтрацией по категориям"""
+    model = Recipe
+    template_name = "account/my_recipes.html"
+    context_object_name = "recipes"
+    paginate_by = 8
 
+    def get_queryset(self):
+        """Опубликованные рецепты с фильтрацией по категориям"""
+        nickname = self.kwargs.get("nickname")
+        profile_user = get_object_or_404(User, nickname=nickname)
+
+        # Все опубликованные рецепты
+        queryset = Recipe.objects.filter(author=profile_user).order_by("-created_at")
+
+        # Фильтрацию по категориям через GET-запрос
+        category_id = self.request.GET.get("category")
+        if category_id:
+            queryset = queryset.filter(category__id=category_id)
+
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        """Добавление в контекст категорий и владельца профиля"""
+        context = super().get_context_data(**kwargs)
+        nickname = self.kwargs.get("nickname")
+        profile_user = get_object_or_404(User, nickname=nickname)
+
+        context["categories"] = Category.objects.all()
+        context["profile_user"] = profile_user
+        return context
 
 
 

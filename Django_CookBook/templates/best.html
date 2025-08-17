@@ -43,9 +43,19 @@
         display: inline-block;
         color: rgb(118, 0, 2);
         font-weight: bold;
+        font-size: 14px;
         text-decoration: none;
         padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
         transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .recipe-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
     }
 
     .recipe-btn:hover {
@@ -53,7 +63,6 @@
         text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
     }
 
-   /* Категории в сайдбаре */
     .category-list {
         list-style: none;
         padding: 0;
@@ -62,6 +71,11 @@
 
     .category-list li {
         margin-bottom: 10px;
+        transition: transform 0.3s ease;
+    }
+
+    .category-list li:hover {
+        transform: scale(1.05);
     }
 
     .category-list a {
@@ -70,6 +84,12 @@
         font-size: 20px;
         font-style: italic;
         font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .category-list li:hover a {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(255,255,255,1);
     }
 
     .active-category {

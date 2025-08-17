@@ -44,7 +44,7 @@ body {
 .navbar a:active {
     transform: scale(1.2);
     color: white;
-    text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    text-shadow: 0 0 8px rgba(200, 189, 176, 1);
 }
 
 

@@ -1,8 +1,9 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .views import (BestRecipes, SearchRecipe, CreateRecipe, FavoritesListView,
-                    recipe, rate_recipe, add_to_favorites, UserProfileView, profile_view )
+from .views import (BestRecipes, SearchRecipe, CreateRecipe, UpdateRecipe, DeleteRecipe,
+                    FavoritesListView, MyRecipesListView, UserProfileView,
+                    recipe, rate_recipe, add_to_favorites,  profile_view)
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="main.html"), name="main"),
@@ -18,5 +19,8 @@ urlpatterns = [
 
     # Личный кабинет
     path("personal_account/<str:nickname>/", profile_view, name="account"),
-    path("<str:nickname>/favorites/", FavoritesListView.as_view(), name="favorite_recipes")
+    path("personal_account/<str:nickname>/favorites/", FavoritesListView.as_view(), name="favorite_recipes"),
+    path("personal_account/<str:nickname>/recipes/", MyRecipesListView.as_view(), name="my_recipes"),
+    path("personal_account/<str:nickname>/recipe/<int:pk>/edit/", UpdateRecipe.as_view(), name="edit_recipe"),
+    path("personal_account/<str:nickname>/recipe/<int:pk>/delete/", DeleteRecipe.as_view(), name="delete_recipe"),
 ]

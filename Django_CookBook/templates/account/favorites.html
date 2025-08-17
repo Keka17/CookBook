@@ -3,6 +3,11 @@
 
 {% block extra_css %}
 <style>
+    .content-area {
+    display: flex;
+    flex-direction: column;
+    }
+
     .citation {
         font-family: 'Playfair Display', serif;
         font-style: italic;
@@ -20,7 +25,7 @@
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 20px;
-        flex: 1;
+        margin-bottom: 0;
     }
 
     .recipe-card {
@@ -159,6 +164,7 @@
 
     .category-list li {
         margin-bottom: 10px;
+        transition: transform 0.3s ease;
     }
 
     .category-list a {
@@ -167,6 +173,12 @@
         font-size: 20px;
         font-style: italic;
         font-weight: bold;
+        transition: all 0.3s ease;
+    }
+
+    .category-list li:hover a {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(255,255,255,1);
     }
 
     .active-category {
@@ -199,10 +211,10 @@
                     <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
                 </div>
                 {% empty %}
-                <p class="empty-message">Нет сохраненных рецептов данной категории.</p>
+                    <p class="empty-message">Нет сохраненных рецептов данной категории.</p>
                 {% endfor %}
             </div>
-        </div>
+
 
         <!-- Пагинация -->
         {% if is_paginated %}
@@ -249,6 +261,7 @@
                 {% endif %}
             </ul>
         {% endif %}
+        </div>
 
         <!-- Сайдбар с категориями -->
         <div class="sidebar">
@@ -271,10 +284,8 @@
             </ul>
 
              <div class="sidebar-image">
-                <img src="{% static 'pictures/fav.png' %}" alt="Избранное" />
+                <img src="{% static 'pictures/fav.png' %}"/>
             </div>
-
         </div>
-
     </div>
 {% endblock %}

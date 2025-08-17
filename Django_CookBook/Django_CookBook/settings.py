@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     
     'app',
     'django_ckeditor_5',
+    'django_cleanup.apps.CleanupConfig',  # Для удаления файлов из media/
     'storages',
 ]
 
