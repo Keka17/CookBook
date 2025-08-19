@@ -2,7 +2,7 @@
     <div class="navbar-links">
         <a href="{% url 'main' %}" class="nav-link">Главная</a>
         <a href="{% url 'create_recipe' %}" class="nav-link">Добавить рецепт</a>
-        <a href="##" class="nav-link">Настройки аккаунта</a>
+        <a href="{% url 'edit_account' request.user.nickname %}" class="nav-link">Настройки аккаунта</a>
         <a href="##" class="nav-link">Выход</a>
     </div>
 </div>

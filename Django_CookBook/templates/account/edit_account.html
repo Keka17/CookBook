@@ -1,0 +1,412 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .account-edit-container {
+        display: grid;
+        grid-template-columns: 0.8fr 3fr;
+        gap: 40px;
+        margin-top: 20px;
+        padding: 20px;
+        position: relative;
+    }
+
+    .citation {
+        grid-column: span 2;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #2E2E2E;
+    }
+
+    /* Левая часть */
+    .edit-left {
+        text-align: center;
+        position: relative;
+    }
+
+    .edit-left img.top-girl {
+        max-width: 90%;
+        height: auto;
+        position: absolute;
+        top: 350x;
+        left: 30px;
+    }
+
+    .edit-left img.bottom-girl {
+        max-width: 100%;
+        height: auto;
+        position: absolute;
+        bottom: 220px;
+        left: 50px;
+        z-index: 2;
+    }
+
+    .account-avatar {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+    }
+
+    /* Спрятать стандартную кнопку выбора файла */
+    input[type="file"] {
+        position: absolute;
+        left: -9999px;
+    }
+
+    .avatar-btn {
+        display: block;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        border: 1px solid black;
+        border-radius: 5px;
+        width: 140px;
+        padding: 8px 8px;
+        margin: 10px auto 0;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        margin-top: 10px;
+    }
+
+    .avatar-btn:hover {
+       transform: scale(1.1);
+       text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Правая часть */
+    .edit-right {
+        position: relative;
+    }
+
+    .edit-right img.right-girl {
+        max-width: 21%;
+        height: auto;
+        position: absolute;
+        top: -120px;
+        right: -20px;
+    }
+
+    .account-form-box {
+        width: 70%;
+        background-color: #fdf5e6;
+        padding: 50px;
+        border: 1px solid #a77b5d;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .account-form-group {
+        margin-bottom: 30px;
+    }
+
+    .account-form-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .account-form-input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .account-form-error {
+        color: #b30000;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        border: 1px solid #a77b5d;
+        border-radius: 4px;
+        background-color: #fff9f0;
+    }
+
+    #id_email {
+        height: 30px;
+        width: 100%;
+        font-size: 16px;
+    }
+
+    #id_nickname {
+        height: 30px;
+        font-size: 16px;
+    }
+
+    #id_bio {
+        min-height: 150px;
+        width: 100% !important;
+        font-family: 'Roboto', sans-serif;
+        font-size: 16px;
+    }
+
+    .password-group {
+        margin-top: 25px;
+    }
+
+    .password-change-btn {
+        display: block;
+        width: 140px;
+        padding: 8px 8px;
+        border: 1px solid black;
+        border-radius: 5px;
+        text-align: center;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        font-size: 14px;
+        font-weight: bold;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .password-change-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+    }
+
+    .password-input {
+        width: calc(100% - 140px);
+        display: inline-block;
+        padding: 8px 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px 0 0 6px;
+        background: #f8f8f8;
+        font-size: 16px;
+        height: 30px;
+    }
+
+    .password-button {
+        display: block;
+        width: 140px;
+        padding: 8px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .password-button:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+    }
+
+    .password-hint {
+        font-size: 12px;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .save-btn {
+        display: block;
+        margin-left: auto;
+        margin-top: 30px;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .save-btn:hover {
+         transform: scale(1.1);
+         text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+    }
+
+    .bottom-actions {
+        grid-column: span 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 40px;
+    }
+
+    .back-button {
+        margin-top: 30px;
+        text-align: center;
+
+    }
+
+    .back-button a {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 16px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .back-button a:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+    .delete-link {
+        grid-column: span 2;
+        margin-top: 40px;
+        text-align: right;
+        font-size: 13px;
+    }
+
+    .delete-link a {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 16px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .delete-link a:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "includes/navbars/account_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="account-edit-container">
+
+    <span class="citation">«Превратите ваш профиль в идеальный рецепт!»</span>
+
+    <!-- Левая часть -->
+    <div class="edit-left">
+        <img src="{% static 'pictures/girl1.png' %}" class="top-girl" alt="girl1">
+
+
+        <img src="{% static 'pictures/girl3.png' %}" class="bottom-girl" alt="girl2">
+    </div>
+
+    <!-- Правая часть -->
+    <div class="edit-right">
+    <img src="{% static 'pictures/girl2.png' %}" class="right-girl" alt="girl3">
+
+    <div class="account-form-box">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.media }}
+
+            <!-- Аватар -->
+            <div class="account-form-group" style="text-align:center;">
+                {% if form.avatar.value %}
+                    <img src="{{ form.avatar.value.url }}" alt="avatar" class="account-avatar" id="avatar-preview">
+                {% else %}
+                    <img src="{% static 'pictures/default-avatar.png' %}" alt="avatar" class="account-avatar" id="avatar-preview">
+                {% endif %}
+
+                {{ form.avatar }}
+                <button type="button" class="avatar-btn" id="avatar-btn">Изменить аватар</button>
+                {% if form.avatar.errors %}
+                    <div class="account-form-error">{{ form.avatar.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Email -->
+            <div class="account-form-group">
+                <label class="account-form-label">{{ form.email.label }}</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="account-form-error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Никнейм -->
+            <div class="account-form-group">
+                <label class="account-form-label">{{ form.nickname.label }}</label>
+                {{ form.nickname }}
+                <small style="font-size: 12px; color: #777;">Никнейм нельзя изменить</small>
+            </div>
+
+            <!-- Биография -->
+            <div class="account-form-group">
+                <label class="account-form-label">{{ form.bio.label }}</label>
+                {{ form.bio }}
+                {% if form.bio.errors %}
+                    <div class="account-form-error">{{ form.bio.errors }}</div>
+                {% endif %}
+            </div>
+
+            <!-- Пароль -->
+            <div class="password-group">
+                <a href="#" class="password-change-btn">Сменить пароль</a>
+                <div class="password-hint">
+                    Мы перенаправим вас на форму смены пароля (реализуем позже)
+                </div>
+            </div>
+
+            <!-- Сохранить -->
+            <button type="submit" class="save-btn">Сохранить изменения</button>
+        </form>
+    </div>
+</div>
+
+
+    <!---Кнопка "Назад", возврат к прошлой странице-->
+    <div class="bottom-actions">
+        <div class="back-button">
+            <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+        </div>
+        <div class="delete-link">
+            <a href="#">Удалить аккаунт (AJAX)</a>
+        </div>
+    </div>
+
+</div>
+
+
+{% block extra_js %}
+<script>
+
+    // Для загрузки аватара через красивый инпут
+    document.addEventListener("DOMContentLoaded", function() {
+        const input = document.getElementById("id_avatar");  // Django сгенерирует именно так
+        const btn = document.getElementById("avatar-btn");
+
+        btn.addEventListener("click", () => input.click());
+    });
+
+</script>
+{% endblock %}
+
+
+{% endblock %}

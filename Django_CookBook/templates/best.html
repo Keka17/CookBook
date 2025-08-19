@@ -159,6 +159,17 @@
         background-color: #f8f8f8;
     }
 
+    .empty-message {
+        grid-column: 1 / -1; /* занимает всю ширину сетки */
+        text-align: center;
+        align-self: center;
+        justify-self: center;
+        font-style: italic;
+        color: gray;
+        font-size: 18px;
+        padding: 40px 0;
+    }
+
 </style>
 {% endblock %}
 
@@ -180,6 +191,8 @@
                 <div>{{ recipe.preview }}</div>
                 <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
             </div>
+            {% empty %}
+            <p class="empty-message">Пока нет опубликованных рецептов данной категории.</p>
             {% endfor %}
         </div>
 

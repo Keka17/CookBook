@@ -153,36 +153,35 @@
             {% csrf_token %}
             {{ form.media }}
 
-            <!-- Общие ошибки формы -->
              <div class="form-group">
-    {{ form.dish_name.label_tag }}
-    {{ form.dish_name }}
-    <div class="live-error"></div>
-</div>
+                {{ form.dish_name.label_tag }}
+                {{ form.dish_name }}
+                 <div class="live-error"></div>
+            </div>
 
-<div class="form-group">
-    {{ form.picture.label_tag }}
-    {{ form.picture }}
-    <div class="live-error"></div>
-</div>
+            <div class="form-group">
+                {{ form.picture.label_tag }}
+                {{ form.picture }}
+                <div class="live-error"></div>
+            </div>
 
-<div class="form-group">
-    {{ form.category.label_tag }}
-    {{ form.category }}
-    <div class="live-error"></div>
-</div>
+            <div class="form-group">
+                {{ form.category.label_tag }}
+                {{ form.category }}
+                <div class="live-error"></div>
+            </div>
 
-<div class="form-group">
-    {{ form.description.label_tag }}
-    {{ form.description }}
-    <div class="live-error"></div>
-</div>
+            <div class="form-group">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+                <div class="live-error"></div>
+            </div>
 
-<div class="form-group">
-    {{ form.text.label_tag }}
-    {{ form.text }}
-    <div class="live-error"></div>
-</div>
+            <div class="form-group">
+                {{ form.text.label_tag }}
+                {{ form.text }}
+                <div class="live-error"></div>
+            </div>
 
             <div style="text-align: center;">
                 <button type="submit" class="btn-submit">Опубликовать рецепт</button>

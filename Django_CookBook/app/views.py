@@ -1,11 +1,11 @@
-from audioop import reverse
-from lib2to3.fixes.fix_input import context
+from idlelib.debugobj import dispatch
 
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 
 from .models import Recipe, User, Category, RecipeRating, Favorite
-from .forms import RecipeForm
+from .forms import RecipeForm, SignUpForm
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView,
                                   CreateView, UpdateView, DeleteView, TemplateView)
@@ -83,6 +83,7 @@ class SearchRecipe(ListView):
 
         return context
 
+
 class CreateRecipe(LoginRequiredMixin, CreateView):
     """Создание рецепта авторизованным пользователем"""
     model = Recipe
@@ -98,11 +99,12 @@ class CreateRecipe(LoginRequiredMixin, CreateView):
         return reverse_lazy("recipe_detail", kwargs={"pk": self.object.pk})
 
 
-class UpdateRecipe(UserPassesTestMixin, UpdateView):
+class UpdateRecipe(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Редактирование рецепта только его автором"""
     model = Recipe
     form_class = RecipeForm
     template_name = "create.html"
+    raise_exception = True  # Ошибка 403 - Fordbidden
 
     # Перенаправление на отредактированный рецепт
     def get_success_url(self):
@@ -110,8 +112,8 @@ class UpdateRecipe(UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         """Проверка, является ли пользователь автором рецепта"""
-        ad = self.get_object()
-        return self.request.user == ad.author
+        recipe = self.get_object()
+        return self.request.user == recipe.author
 
     def get_form(self, form_class=None):
         """Ограничение на редактируемые поля"""
@@ -128,20 +130,22 @@ class UpdateRecipe(UserPassesTestMixin, UpdateView):
         return form
 
 
-class DeleteRecipe(UserPassesTestMixin, DeleteView):
+class DeleteRecipe(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Удаление рецепта только его автором"""
     model = Recipe
     template_name = "recipe_delete.html"
     success_url = reverse_lazy("my_recipes")
+    raise_exception = True  # Ошибка 403 - Fordbidden
 
     def test_func(self):
         """Проверка авторства"""
-        ad = self.get_object()
-        return self.request.user == ad.author
+        recipe = self.get_object()
+        return self.request.user == recipe.author
 
     def get_success_url(self):
         nickname = self.kwargs.get("nickname")
         return reverse_lazy("my_recipes", kwargs={"nickname": nickname})
+
 
 def recipe(request, pk):
     """Конкретный рецепт; авторизованные пользователи
@@ -170,6 +174,7 @@ def recipe(request, pk):
 
     return render(request, "recipe.html", context)
 
+
 @login_required
 def rate_recipe(request, pk):
     """Обработка оценки рецепта авторизованным пользователем;
@@ -187,6 +192,7 @@ def rate_recipe(request, pk):
 
     # Перенаправление на страницу рецепта
     return redirect('recipe_detail', pk=recipe.pk)
+
 
 @login_required
 def add_to_favorites(request, pk):
@@ -230,6 +236,36 @@ class UserProfileView(DetailView):
         context["categories"] = Category.objects.all()
 
         return context
+
+
+class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """Редактирования профиля в ЛК;
+    доступно только владельцу аккаунта, никнейм неизменяем """
+    model = User
+    form_class = SignUpForm
+    template_name = "account/edit_account.html"
+
+    # Поиск пользователя по никнейму (slug), а не pk
+    slug_field = "nickname"  #
+    slug_url_kwarg = "nickname"
+
+    raise_exception = True  # Ошибка 403 - Fordbidden, если test_func = False
+
+    def test_func(self):
+        """Проверка на возможность редактирования - только обладатель аккаунта"""
+        user = self.get_object()  # Получение пользоваиеля по slug из URL
+        return self.request.user == user
+
+    def get_form(self, form_class=None):
+        """Никнейм только для чтения - неизменяемое поле"""
+        form = super().get_form(form_class)
+        form.fields["nickname"].disabled = True
+        return form
+
+    def get_success_url(self):
+        """После успешного редактирования профиля - возврат в ЛК"""
+        return reverse_lazy("account", kwargs={
+            "nickname": self.request.user.nickname})
 
 
 @login_required
@@ -285,6 +321,7 @@ class FavoritesListView(ListView):
         context["categories"] = Category.objects.all()
         context["profile_user"] = profile_user
         return context
+
 
 class MyRecipesListView(ListView):
     """Опубликованные рецепты пользователя с фильтрацией по категориям"""

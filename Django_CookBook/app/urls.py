@@ -2,7 +2,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from .views import (BestRecipes, SearchRecipe, CreateRecipe, UpdateRecipe, DeleteRecipe,
-                    FavoritesListView, MyRecipesListView, UserProfileView,
+                    FavoritesListView, MyRecipesListView, UserProfileView, ProfileUpdateView,
                     recipe, rate_recipe, add_to_favorites,  profile_view)
 
 urlpatterns = [
@@ -19,6 +19,7 @@ urlpatterns = [
 
     # Личный кабинет
     path("personal_account/<str:nickname>/", profile_view, name="account"),
+    path("personal_account/<str:nickname>/edit_account/", ProfileUpdateView.as_view(), name="edit_account"),
     path("personal_account/<str:nickname>/favorites/", FavoritesListView.as_view(), name="favorite_recipes"),
     path("personal_account/<str:nickname>/recipes/", MyRecipesListView.as_view(), name="my_recipes"),
     path("personal_account/<str:nickname>/recipe/<int:pk>/edit/", UpdateRecipe.as_view(), name="edit_recipe"),

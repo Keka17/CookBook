@@ -129,6 +129,31 @@
         color: gold;
     }
 
+    .back-button {
+        margin-top: 30px;
+        text-align: center;
+
+    }
+
+    .back-button a {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 16px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .back-button a:hover {
+            transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
     /* Модальное окно */
     .modal {
         display: none;
@@ -222,7 +247,13 @@
             <div class="recipe-text">{{ recipe.text|safe }}</div>
         </div>
     </div>
-</div>
+
+    <!---Кнопка "Назад", возврат к прошлой странице-->
+    <div class="back-button">
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+    </div>
+
+    </div>
 
 <!-- Модальное окно -->
 <div id="login-modal" class="modal">

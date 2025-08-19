@@ -87,6 +87,26 @@
         padding: 40px 0;
    }
 
+   .pagination-container {
+        position: relative;
+        margin-top: 30px;
+        min-height: 50px;
+    }
+
+    .back-btn {
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .pagination-wrapper {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+
 
     .pagination {
         display: flex;
@@ -216,51 +236,41 @@
             </div>
 
 
-        <!-- Пагинация -->
-        {% if is_paginated %}
-             <ul class="pagination">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1">Первая</a>
-                    </li>
+        <!-- Кнопка + пагинация -->
+            <div class="pagination-container">
 
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">←</a>
-                    </li>
+            <!-- Кнопка "Вернуться назад" -->
+            <div class="back-btn">
+                <a href="{% url 'account' profile_user.nickname %}" class="recipe-btn">← Вернуться назад</a>
+            </div>
 
-                {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">Первая</span>
-                    </li>
+            <!-- Пагинация -->
+            {% if is_paginated %}
+                 <div class="pagination-wrapper">
+                     <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item"><a class="page-link" href="?page=1">Первая</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">←</a></li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">Первая</span></li>
+                            <li class="page-item disabled"><span class="page-link">←</span></li>
+                        {% endif %}
 
-                    <li class="page-item disabled">
-                        <span class="page-link">←</span>
-                    </li>
-                {% endif %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                        </li>
 
-                <li class="page-item active">
-                    <span class="page-link">
-                        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-                    </span>
-                </li>
-
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">→</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a>
-                    </li>
-                {% else %}
-                    <li class="page-item disabled">
-                        <span class="page-link">→</span>
-                    </li>
-                    <li class="page-item disabled">
-                        <span class="page-link">Последняя</span>
-                    </li>
-                {% endif %}
-            </ul>
-        {% endif %}
+                        {% if page_obj.has_next %}
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">→</a></li>
+                            <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Последняя</a></li>
+                        {% else %}
+                            <li class="page-item disabled"><span class="page-link">→</span></li>
+                            <li class="page-item disabled"><span class="page-link">Последняя</span></li>
+                        {% endif %}
+                     </ul>
+                 </div>
+            {% endif %}
+        </div>
         </div>
 
         <!-- Сайдбар с категориями -->
