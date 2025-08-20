@@ -196,7 +196,13 @@
 <div class="account-container">
   <!-- Левая колонка -->
     <div class="account-left">
-      <img src="{{ profile_user.avatar.url }}" alt="Аватар" class="account-img">
+
+      {% if profile_user.avatar %}
+        <img src="{{ profile_user.avatar.url }}" alt="Аватар" class="account-img">
+      {% else %}
+        <img src="/media/avatars/default.png" alt="Аватар" class="account-img">
+      {% endif %}
+
       <div class="account-info">
         <p><strong>Никнейм:</strong> <i class="account-nickname">{{ profile_user.nickname }}</i></p>
         <p><strong>На сайте с:</strong> {{ profile_user.date_joined|date:"d.m.Y." }}</p>

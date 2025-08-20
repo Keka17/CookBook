@@ -82,6 +82,11 @@
        text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
     }
 
+    .avatar-delete-btn {
+        background-color: #8b0000;
+         margin-top: 5px;
+    }
+
     /* Правая часть */
     .edit-right {
         position: relative;
@@ -322,20 +327,36 @@
     <img src="{% static 'pictures/girl2.png' %}" class="right-girl" alt="girl3">
 
     <div class="account-form-box">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" novalidate>
             {% csrf_token %}
             {{ form.media }}
 
             <!-- Аватар -->
             <div class="account-form-group" style="text-align:center;">
+
                 {% if form.avatar.value %}
                     <img src="{{ form.avatar.value.url }}" alt="avatar" class="account-avatar" id="avatar-preview">
                 {% else %}
-                    <img src="{% static 'pictures/default-avatar.png' %}" alt="avatar" class="account-avatar" id="avatar-preview">
+                    <img src="/media/avatars/default.png" alt="avatar" class="account-avatar" id="avatar-preview">
                 {% endif %}
 
                 {{ form.avatar }}
-                <button type="button" class="avatar-btn" id="avatar-btn">Изменить аватар</button>
+
+                <!-- Проверка на наличие недефолтного аватара-->
+                {% if form.instance.avatar %}
+                    <button type="button" class="avatar-btn" id="avatar-btn">Изменить аватар</button>
+                    <button type="button" class="avatar-btn" id="avatar-delete-btn">Удалить аватар</button>
+
+                {% else %}
+                    <button type="button" class="avatar-btn" id="avatar-btn">Изменить аватар</button>
+                {% endif %}
+
+                <!--- Скрытый input для бэка -->
+                <input type="hidden" name="delete_avatar" id="delete-avatar-flag" value="0">
+
+                <!-- Контейнеры для ошибок -->
+                <div class="live-error"></div>
+
                 {% if form.avatar.errors %}
                     <div class="account-form-error">{{ form.avatar.errors }}</div>
                 {% endif %}
@@ -345,6 +366,8 @@
             <div class="account-form-group">
                 <label class="account-form-label">{{ form.email.label }}</label>
                 {{ form.email }}
+                <div class="live-error"></div>
+
                 {% if form.email.errors %}
                     <div class="account-form-error">{{ form.email.errors }}</div>
                 {% endif %}
@@ -355,12 +378,15 @@
                 <label class="account-form-label">{{ form.nickname.label }}</label>
                 {{ form.nickname }}
                 <small style="font-size: 12px; color: #777;">Никнейм нельзя изменить</small>
+                <div class="live-error"></div>
             </div>
 
             <!-- Биография -->
             <div class="account-form-group">
                 <label class="account-form-label">{{ form.bio.label }}</label>
                 {{ form.bio }}
+                <div class="live-error"></div>
+
                 {% if form.bio.errors %}
                     <div class="account-form-error">{{ form.bio.errors }}</div>
                 {% endif %}
@@ -393,20 +419,152 @@
 
 </div>
 
-
 {% block extra_js %}
 <script>
+    // ----- Управление загрузкой и удалением аватара -----
 
-    // Для загрузки аватара через красивый инпут
     document.addEventListener("DOMContentLoaded", function() {
-        const input = document.getElementById("id_avatar");  // Django сгенерирует именно так
-        const btn = document.getElementById("avatar-btn");
+        const input = document.getElementById("id_avatar");
+        const btnUpload = document.getElementById("avatar-btn");
+        const btnDelete = document.getElementById("avatar-delete-btn");
+        const preview = document.getElementById("avatar-preview");
+        const deleteFlag = document.getElementById("delete-avatar-flag");
 
-        btn.addEventListener("click", () => input.click());
+        if (btnUpload) {
+            btnUpload.addEventListener("click", () => {
+                input.click();
+            });
+        }
+
+        if (input) {
+            input.addEventListener("change", function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        deleteFlag.value = "0"; // сбрасываем удаление
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        if (btnDelete) {
+            btnDelete.addEventListener("click", () => {
+                preview.src = "/media/avatars/default.png";
+                input.value = ""; // убираем выбранный файл
+                deleteFlag.value = "1"; // отмечаем флаг
+            });
+        }
+
+        // ----- Динамическая валидация -----
+        const form = document.querySelector("form");
+        const fields = document.querySelectorAll(".form-control");
+
+        // ----- Placeholder скрытие -----
+        fields.forEach(field => {
+        const placeholder = field.getAttribute("placeholder");
+            if (placeholder) {
+                field.addEventListener("focus", () => field.setAttribute("placeholder", ""));
+                field.addEventListener("blur", () => {
+                    if (!field.value.trim()) {
+                        field.setAttribute("placeholder", placeholder);
+                    }
+            });
+        }
     });
 
-</script>
-{% endblock %}
+    // ----- Проверка и вывод ошибки -----
+    function showError(input, message) {
+        const errorDiv = input.closest(".account-form-group").querySelector(".live-error");
+        errorDiv.textContent = message || "";
+        errorDiv.style.color = message ? "#ad1517" : "";
+    }
 
+     // ----- Элементы формы для изменения -----
+    const email = document.querySelector("#id_email");
+    const bio = document.querySelector("#id_bio");
+    const avatar = document.querySelector("#id_avatar");
+
+    // ----- Функции валидации -----
+    function validateEmail() {
+        const v = email.value.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!v) {
+            showError(email, "Введите email.");
+            return false;
+        } else if (!emailRegex.test(v)) {
+            showError(email, "Введите корректный email.");
+            return false;
+        }
+
+        showError(email, "");
+        return true;
+    }
+
+    function validateBio() {
+        const v = bio.value.trim();
+        const firstChar = v.charAt(0);
+
+        if (v && !/^[A-ZА-ЯЁ]$/i.test(firstChar)) {
+            showError(bio, "Биография должна начинаться с буквы.");
+            return false;
+        } else if (v && firstChar !== firstChar.toUpperCase()) {
+            showError(bio, "Первая буква должна быть заглавной.");
+            return false;
+        }
+
+        showError(bio, "");
+        return true;
+    }
+
+
+    function validateAvatar() {
+        const file = avatar.files[0];
+        const isDeleted = deleteFlag.value === "1";
+
+        // Если аватар удален или не выбран новый - все ок
+        if (isDeleted || !file) {
+            showError(avatar, "");
+            return true;
+        }
+
+        if (file.size > 1024 * 1024) {
+            showError(avatar, "Размер изображения не должен превышать 1 МБ.");
+            return false;
+        }
+
+        showError(avatar, "");
+        return true;
+    }
+
+    // ----- Live-валидация -----
+    if (email) email.addEventListener("input", validateEmail);
+    if (bio) bio.addEventListener("input", validateBio);
+    if (avatar) avatar.addEventListener("change", validateAvatar);
+
+    // ----- Валидация перед отправкой -----
+    form.addEventListener("submit", function(e) {
+        let valid = true;
+
+        if (!validateEmail()) valid = false;
+        if (!validateBio()) valid = false;
+        if (!validateAvatar()) valid = false;
+
+        if (!valid) {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    });
+
+    // ----- Инициализация валидации при загрузке -----
+    validateEmail();
+    validateBio();
+    validateAvatar();
+});
+</script>
+ {% endblock %}
 
 {% endblock %}

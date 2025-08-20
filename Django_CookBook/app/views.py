@@ -262,6 +262,15 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         form.fields["nickname"].disabled = True
         return form
 
+    def form_valid(self, form):
+        """Обработка удаления аватара, если нажата кнопка 'Удалить аватар'"""
+        response = super().form_valid(form)
+        if self.request.POST.get("delete_avatar") == "1":
+            self.object.avatar.delete(save=False)  # удалить файл с диска
+            self.object.avatar = None  # сохранение в базе как None
+            self.object.save()
+        return response
+
     def get_success_url(self):
         """После успешного редактирования профиля - возврат в ЛК"""
         return reverse_lazy("account", kwargs={
