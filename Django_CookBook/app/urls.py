@@ -1,3 +1,4 @@
+from django.contrib.auth.views import LoginView
 from django.urls import path
 from django.views.generic import TemplateView
 
@@ -24,4 +25,7 @@ urlpatterns = [
     path("personal_account/<str:nickname>/recipes/", MyRecipesListView.as_view(), name="my_recipes"),
     path("personal_account/<str:nickname>/recipe/<int:pk>/edit/", UpdateRecipe.as_view(), name="edit_recipe"),
     path("personal_account/<str:nickname>/recipe/<int:pk>/delete/", DeleteRecipe.as_view(), name="delete_recipe"),
+
+    # Аутентификация, регистрация
+    path("login/", LoginView.as_view(template_name="auth/login.html"), name="login"),
 ]

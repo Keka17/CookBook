@@ -1,0 +1,217 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .login-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        margin-top: 20px;
+        padding: 20px;
+        position: relative;
+    }
+
+    .citation {
+        grid-column: span 2;
+        text-align: center;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #2E2E2E;
+    }
+
+     .login-left {
+        text-align: center;
+        position: relative;
+    }
+
+    .login-form-error {
+        color: #ff6a55;
+        padding: 10px 12px;
+        margin: 12px 0;
+        font-size: 14px;
+    }
+
+     .login-image img {
+        max-width: 100%;
+        margin-left: 100px;
+    }
+
+    .login-form-box {
+        width: 420px;
+        margin: 20px auto;
+        background-color: #fdf5e6;
+        padding: 40px;
+        border: 1px solid #a77b5d;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .login-form-title {
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+        font-style: italic;
+        margin-bottom: 25px;
+        color: rgb(102, 13, 12);
+    }
+
+    .login-form-group {
+        margin-bottom: 25px;
+    }
+
+    .login-form-label {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: block;
+        color: #3e2c20;
+    }
+
+    .login-form-input {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1px solid #a77b5d;
+        border-radius: 6px;
+        font-size: 15px;
+        background-color: #fff9f0;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-form-input:focus {
+        border-color: #8b5e3c;
+        box-shadow: 0 0 6px rgba(139, 94, 60, 0.3);
+        outline: none;
+    }
+
+    .login-form-error {
+        color: #b30000;
+        font-size: 13px;
+        margin-top: 6px;
+    }
+
+    .login-btn {
+        display: block;
+        margin-left: auto;
+        margin-top: 30px;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .login-btn:hover {
+       transform: scale(1.1);
+       text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+    }
+
+    .login-extra {
+        text-align: center;
+        margin-top: 20px;
+        font-weight: bold;
+    }
+
+    .login-extra a {
+        display: inline-block;
+        color: rgb(102, 13, 12);
+        font-size: 16px;
+        text-decoration: none;
+        transition: transform 0.3s ease;
+    }
+
+    .login-extra a:hover {
+        color: #871817;
+        text-decoration: none;
+        transform: scale(1.1);
+        text-shadow: 0 0 15px rgba(255, 255, 255, 1);
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+}
+
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "includes/navbars/minimal_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="login-wrapper">
+
+        <span class="citation">«Рады видеть вас снова!»</span>
+
+        <!-- Левая часть с изображением -->
+        <div class="login-left">
+        <div class="login-image">
+            <img src="{% static 'pictures/login.png' %}" alt="Вход">
+        </div>
+        </div>
+
+        <!-- Правая часть: форма входа -->
+        <div class="login-form-box">
+            <h2 class="login-form-title">Вход</h2>
+
+            <form method="post">
+                {% csrf_token %}
+
+                <!-- Ошибки формы -->
+                {% if form.errors %}
+                    <div class="login-form-error" role="alert" aria-live="polite">
+                        <strong>Ошибка входа:</strong> проверьте правильность введённых данных.
+                    </div>
+                {% endif %}
+
+                <div class="login-form-group">
+                    <label for="id_username" class="form-label">Email</label>
+                    <input type="email" name="username" id="id_username"
+                    class="login-form-input" required
+                    value="{{ form.username.value|default:'' }}">
+                </div>
+
+                <!-- Пароль с глазиком -->
+                <div class="login-form-group" style="position: relative;">
+                    <label for="id_password" class="form-label">Пароль</label>
+                    <input type="password" name="password" id="id_password"
+                           class="login-form-input" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    Вернуться в уютный кулинарный мир 🥧
+                </button>
+            </form>
+
+            <div class="login-extra">
+                <a href="#">Забыли пароль?</a> |
+                <a href="#">Регистрация </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('id_password');
+    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    passwordInput.setAttribute('type', type);
+}
+</script>
+
+{% endblock %}

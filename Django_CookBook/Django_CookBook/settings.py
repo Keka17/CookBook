@@ -118,6 +118,17 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'app.User'  # Кастомная модель юзера
 
 
+# URL для перенаправления неаутентифицированных пользователей
+# При использовании @login_required u LoginRequiredMixin
+# пользователь будет перенаправлен на эту страницу для входа, # после успешной аутентификации возвращен на запрашиваемую ранее страницу
+LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = '/'  # После входа переход на главную страницу
+
+
+# Консольный бэкенд
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
 CKEDITOR_5_CONFIGS = {
     "default": {
         "height": "500px",
