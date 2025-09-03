@@ -120,13 +120,30 @@ AUTH_USER_MODEL = 'app.User'  # Кастомная модель юзера
 
 # URL для перенаправления неаутентифицированных пользователей
 # При использовании @login_required u LoginRequiredMixin
-# пользователь будет перенаправлен на эту страницу для входа, # после успешной аутентификации возвращен на запрашиваемую ранее страницу
+# пользователь будет перенаправлен на эту страницу для входа,
+# после успешной аутентификации возвращен на запрашиваемую ранее страницу
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = '/'  # После входа переход на главную страницу
 
 
-# Консольный бэкенд
+load_dotenv()
+
+# Для разработки - вывод писем на консоль
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+# productin: Почтовый мененджер для отправки кодов и ссылок
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+#
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+#
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# SERVER_EMAIL = EMAIL_HOST_USER
+# EMAIL_ADMIN = EMAIL_HOST_USER
 
 
 CKEDITOR_5_CONFIGS = {

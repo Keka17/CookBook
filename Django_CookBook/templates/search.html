@@ -102,7 +102,7 @@
 
     .recipe-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 0.8fr);
         gap: 20px;
         flex: 1;
     }
@@ -216,7 +216,7 @@
         <!-- Поисковая строка -->
         <div class="search-container">
             <form method="get" action="{% url 'recipe_search' %}" class="search-form">
-            <input type="text" name="q" placeholder="Введите название блюда с заглавной буквы" value="{{ search_query }}">
+            <input type="text" name="q" placeholder="Введите название блюда" value="{{ search_query }}">
             <button type="submit">Найти</button>
             </form>
         </div>

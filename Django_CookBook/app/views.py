@@ -1,4 +1,3 @@
-from idlelib.debugobj import dispatch
 
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
@@ -9,7 +8,7 @@ from .forms import RecipeForm, SignUpForm
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import (ListView, DetailView,
                                   CreateView, UpdateView, DeleteView, TemplateView)
-from django.db.models import Avg, Count
+from django.db.models import Avg, Count, Q
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -20,7 +19,7 @@ class BestRecipes(ListView):
     model = Recipe
     template_name = "best.html"
     context_object_name = "recipes"
-    paginate_by = 6
+    paginate_by = 10
 
     def get_queryset(self):
         """Фильтрация рецептов с рейтингом >= 4.7.
@@ -52,20 +51,26 @@ class SearchRecipe(ListView):
     model = Recipe
     template_name = "search.html"
     context_object_name = "recipes"
-    paginate_by = 6
+    paginate_by = 10
 
     def get_queryset(self):
         """Функция возвращает queryset рецептов, отфильтрованных по
-        названию блюда и категории (выбор через sidebar)"""
+        названию блюда, никнейму автора  и категории (выбор через sidebar)"""
         queryset = Recipe.objects.all().order_by('-created_at')
 
         # Получение данных из GET-запроса
         query = self.request.GET.get("q", "").strip()  # Удаление пробелов в поисковом запросе
         category_id = self.request.GET.get("category")
 
-        # Фильтрация по названию
+        # Фильтрация по названию и никнейму автора
+        # Нормализация запроса: первая буква заглавная, остальные — маленькие
         if query:
-            queryset = queryset.filter(dish_name__icontains=query)
+            normalized_query = query.capitalize()
+
+            queryset = queryset.filter(
+                Q(dish_name__icontains=normalized_query) |
+                Q(author__nickname__icontains=normalized_query)
+            )
 
         # Фильтрация по категории
         if category_id:

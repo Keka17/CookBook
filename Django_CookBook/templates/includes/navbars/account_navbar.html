@@ -1,8 +1,36 @@
+
+<style>
+    .logout-btn {
+        background-color: #7a160d;
+        border: none;
+        color: white;
+        text-decoration: none;
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 25px;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        padding: 5px 10px;
+        position: relative;
+        cursor: pointer;
+}
+    .logout-btn:hover,
+    .logout-btn:focus,
+    .logout-btn:active {
+        transform: scale(1.2);
+        color: white;
+        text-shadow: 0 0 8px rgba(200, 189, 176, 1);
+}
+</style>
+
 <div class="navbar">
     <div class="navbar-links">
         <a href="{% url 'main' %}" class="nav-link">Главная</a>
         <a href="{% url 'create_recipe' %}" class="nav-link">Добавить рецепт</a>
         <a href="{% url 'edit_account' request.user.nickname %}" class="nav-link">Настройки аккаунта</a>
-        <a href="##" class="nav-link">Выход</a>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="logout-btn">Выйти</button>
+        </form>
     </div>
 </div>
