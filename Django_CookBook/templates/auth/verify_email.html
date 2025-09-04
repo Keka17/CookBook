@@ -1,0 +1,131 @@
+{% extends 'default.html' %}
+{% load static %}
+
+{% block extra_css %}
+<style>
+    .verify-container {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin-top: 40px;
+        padding: 20px;
+    }
+
+    .verify-box {
+        width: 420px;
+        background-color: #fdf5e6;
+        padding: 40px;
+        border: 1px solid #a77b5d;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .citation {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-weight: bold;
+        font-size: 22px;
+        margin-bottom: 25px;
+        color: #2E2E2E;
+    }
+
+    .form-label {
+        font-weight: bold;
+        margin-bottom: 8px;
+        display: block;
+        text-align: left;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        font-size: 18px;
+        letter-spacing: 8px;
+        text-align: center;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+
+    .form-error,
+    .live-error {
+        color: #b30000;
+        font-size: 13px;
+        margin-top: 5px;
+        min-height: 18px;
+    }
+
+</style>
+{% endblock %}
+
+{% block navbar %}
+    {% include "includes/navbars/minimal_navbar.html" %}
+{% endblock %}
+
+{% block content %}
+<div class="verify-container">
+    <div class="verify-box">
+        <div class="citation">Подтвердите, пожалуйста, свой адрес.
+            Для нас важно, чтобы в нашем кулинарном сообществе царил порядок.</div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <label class="form-label" for="id_code">Код подтверждения</label>
+            <input type="text" id="id_code" name="code" maxlength="6" class="form-input form-control" placeholder="------" required>
+            <div class="live-error" id="code-error"></div>
+        </form>
+
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const codeInput = document.getElementById("id_code");
+    const errorDiv = document.getElementById("code-error");
+    const form = document.querySelector("form");
+
+    codeInput.addEventListener("input", () => {
+        // Оставляем только цифры и максимум 6 символов
+        codeInput.value = codeInput.value.replace(/[^0-9]/g, "").slice(0, 6);
+        errorDiv.textContent = "";
+
+        // Если длина 6 → проверяем код
+        if (codeInput.value.length === 6) {
+            checkCode(codeInput.value);
+        }
+    });
+
+    function checkCode(code) {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const email = "{{ email }}";  // передается из контекста шаблона
+
+        fetch("{% url 'verify_email' email=email %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken
+            },
+            body: new URLSearchParams({ code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Если код верный → редирект на логин
+                window.location.href = "{% url 'login' %}";
+            } else {
+                // Если код неверный → вывод ошибки
+                errorDiv.textContent = "Неверный код. Попробуйте ещё раз.";
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            errorDiv.textContent = "Ошибка сервера. Попробуйте позже.";
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

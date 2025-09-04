@@ -3,8 +3,9 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from .views import (BestRecipes, SearchRecipe, CreateRecipe, UpdateRecipe, DeleteRecipe,
-                    FavoritesListView, MyRecipesListView, UserProfileView, ProfileUpdateView,
-                    recipe, rate_recipe, add_to_favorites,  profile_view)
+                    FavoritesListView, MyRecipesListView, UserProfileView, SignUpView, VerifyEmailView,
+                    ProfileUpdateView, recipe, rate_recipe, add_to_favorites, profile_view,
+                    delete_account, check_nickname)
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="main.html"), name="main"),
@@ -21,6 +22,7 @@ urlpatterns = [
     # Личный кабинет
     path("personal_account/<str:nickname>/", profile_view, name="account"),
     path("personal_account/<str:nickname>/edit_account/", ProfileUpdateView.as_view(), name="edit_account"),
+    path("ajax_delete_account/", delete_account, name="ajax_delete_account"),
     path("personal_account/<str:nickname>/favorites/", FavoritesListView.as_view(), name="favorite_recipes"),
     path("personal_account/<str:nickname>/recipes/", MyRecipesListView.as_view(), name="my_recipes"),
     path("personal_account/<str:nickname>/recipe/<int:pk>/edit/", UpdateRecipe.as_view(), name="edit_recipe"),
@@ -28,5 +30,8 @@ urlpatterns = [
 
     # Аутентификация, регистрация
     path("login/", LoginView.as_view(template_name="auth/login.html"), name="login"),
-    path("logout/", LogoutView.as_view(next_page="main"), name="logout")
+    path("logout/", LogoutView.as_view(next_page="main"), name="logout"),
+    path("signup/", SignUpView.as_view(), name="signup"),
+    path("verify_email/<str:email>/", VerifyEmailView.as_view(), name="verify_email"),
+    path("ajax/check-nickname/", check_nickname, name="check_nickname"),
 ]

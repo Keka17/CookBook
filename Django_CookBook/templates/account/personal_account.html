@@ -328,9 +328,9 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
             headers: {
                 "X-CSRFToken": csrftoken,
-                "Content-Type": "application/x-www-form-urlencoded", // ✅ важно
+                "Content-Type": "application/x-www-form-urlencoded", //
             },
-            body: "" // Django DeleteView ожидает POST body (пусть пустой)
+            body: "" //
         }).then(response => {
             if (response.ok) {
                 location.reload();

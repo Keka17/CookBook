@@ -1,4 +1,4 @@
-
+import re
 from django import forms
 from .models import Recipe, Category, User
 from django.core.exceptions import ValidationError
@@ -64,6 +64,24 @@ class RecipeForm(forms.ModelForm):
 class SignUpForm(forms.ModelForm):
     """Форма регистрации нового пользователя;
     используется также для редактирования профиля в ЛК"""
+
+    password1 = forms.CharField(
+        label="Пароль",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Введите надежный пароль"
+        })
+    )
+    password2 = forms.CharField(
+        label="Подтверждение пароля",
+        widget=forms.PasswordInput(attrs={
+            "class": "form-control",
+            "placeholder": "Повторите пароль"
+        })
+    )
+
+    avatar = forms.ImageField(required=False)
+
     class Meta:
         model = User
         fields = ["email", "nickname", "bio", "avatar"]
@@ -71,7 +89,7 @@ class SignUpForm(forms.ModelForm):
         widgets = {
             "email": forms.EmailInput(attrs={
                 "class": "form-control",
-                "placeholder": "Введите ваш email"
+                "placeholder": "Введите ваш email."
             }),
             "nickname": forms.TextInput(attrs={
                 "class": "form-control",
@@ -80,13 +98,13 @@ class SignUpForm(forms.ModelForm):
             }),
             "bio": forms.Textarea(attrs={
                 "class": "form-control",
-                "placeholder": "Расскажите о себе, ваших кулинарных интересах",
+                "placeholder": "Расскажите о себе, ваших кулинарных интересах.",
                 "rows": 4
             }),
             "avatar": forms.FileInput(attrs={
                 "class": "form-control",
-                "placeholder": "Загрузите изображение (до 1 МБ)"
-            })
+                "placeholder": "Загрузите изображение (до 1 МБ)."
+            }),
         }
 
     def clean_email(self):
@@ -100,8 +118,11 @@ class SignUpForm(forms.ModelForm):
         """Проверка, что первая буква никнейма заглавная + уникальность"""
         nickname = self.cleaned_data.get('nickname')
 
+        if not nickname:
+            raise ValidationError("Введите никнейм.")
+
         if nickname and not nickname[0].isupper():
-            raise ValidationError('Первая буква должна быть заглавной.')
+            raise ValidationError("Первая буква должна быть заглавной!")
 
         if User.objects.filter(nickname=nickname).exclude(pk=self.instance.pk).exists():
             raise ValidationError("Этот никнейм уже занят.")
@@ -112,7 +133,7 @@ class SignUpForm(forms.ModelForm):
         """Проверка, что первая буква биографии заглавная"""
         bio = self.cleaned_data.get('bio')
         if bio and not bio[0].isupper():
-            raise ValidationError('Первая буква должна быть заглавной.')
+            raise ValidationError("Первая буква должна быть заглавной!")
         return bio
 
     def clean_avatar(self):
@@ -121,6 +142,27 @@ class SignUpForm(forms.ModelForm):
         if avatar and avatar.size > 1024 * 1024:
             raise ValidationError('Размер изображения превышает 1 МБ!')
         return avatar
+
+    def clean_password1(self):
+        password = self.cleaned_data.get("password1")
+
+        if len(password) < 8:
+            raise ValidationError("Пароль должен содержать не менее 8 символов.")
+        if not re.search(r"[A-ZА-ЯЁ]", password):
+            raise ValidationError("Пароль должен содержать хотя бы одну заглавную букву.")
+        if not re.search(r"\d", password):
+            raise ValidationError("Пароль должен содержать хотя бы одну цифру.")
+        if not re.search(r"[!@#$%^&*]", password):
+            raise ValidationError("Пароль должен содержать хотя бы один спецсимвол (!@#$%^&*).")
+
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        p1, p2 = cleaned_data.get("password1"), cleaned_data.get("password2")
+        if p1 and p2 and p1 != p2:
+            self.add_error("password2", "Пароли не совпадают.")
+        return cleaned_data
 
 
 

@@ -136,12 +136,13 @@
     .password-toggle {
         position: absolute;
         right: 10px;
-        top: 50%;
+        top: 60%;
         transform: translateY(-50%);
         background: none;
         border: none;
         cursor: pointer;
-}
+        font-size: 16px;
+    }
 
 </style>
 {% endblock %}
@@ -199,7 +200,7 @@
 
             <div class="login-extra">
                 <a href="#">Забыли пароль?</a> |
-                <a href="#">Регистрация </a>
+                <a href="{% url 'signup' %}">Регистрация </a>
             </div>
 
         </div>
@@ -207,11 +208,12 @@
 </div>
 
 <script>
-function togglePassword() {
-    const passwordInput = document.getElementById('id_password');
-    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-    passwordInput.setAttribute('type', type);
-}
+    // ----- Функция для переключения видимости пароля -----
+    function togglePassword() {
+        const passwordInput = document.getElementById('id_password');
+        const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+        passwordInput.setAttribute('type', type);
+    }
 </script>
 
 {% endblock %}

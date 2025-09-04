@@ -1,15 +1,21 @@
-
-from django.shortcuts import render, redirect
+import os
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.utils.decorators import method_decorator
+from django.core.cache import cache
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.mail import send_mail
+
 
 from .models import Recipe, User, Category, RecipeRating, Favorite
 from .forms import RecipeForm, SignUpForm
 from django.shortcuts import render, get_object_or_404
+from django.views import View
 from django.views.generic import (ListView, DetailView,
-                                  CreateView, UpdateView, DeleteView, TemplateView)
+                                  CreateView, UpdateView, DeleteView)
 from django.db.models import Avg, Count, Q
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -302,6 +308,13 @@ def profile_view(request, nickname):
 
     return render(request, "account/personal_account.html", context)
 
+@login_required
+def delete_account(request):
+    """Удаление аккаунта через POST-запрос, AJAX не перегружает страницу"""
+    if request.method == "POST" and request.user.is_authenticated:
+        request.user.delete()
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False}, status=400)
 
 class FavoritesListView(ListView):
     """Избранные рецепты пользователя с фильтрацией по категориям"""
@@ -370,6 +383,137 @@ class MyRecipesListView(ListView):
         return context
 
 
+# Процесс регистрации с верификацией почты через сгенерированный код
+# Модуль secrets предпочтительнее random, так как являтеся криптографичечки надежнее
+import secrets
 
+verification_codes = {}
+
+def generate_verification_code():
+    """Генерация 6-значного кода"""
+    random_int = secrets.randbelow(1000000)
+    return str(f"{random_int:06d}")
+
+
+def save_verification_code(email, form_data, expiry=1800):
+    """Сохранение кода и данные формы в кэше на 30 минут"""
+
+    # Код и данные формы кладутся в Redis
+    code = generate_verification_code()
+    data = {
+        "code": code,
+        "form_data": form_data
+    }
+
+    # Если загружен аватар  → сохранение во временной директории tmp
+    # default_storage.save возвращает путь к сохраненному файлу
+    avatar_file = form_data.get("avatar")
+    if avatar_file:
+        avatar_path = default_storage.save(
+            f"tmp/{avatar_file.name}", ContentFile(avatar_file.read())
+        )
+
+        # Сохранение пути к файлу в данных Redis
+        # Это дает возможность перенести файл в основное хранилище после подтверждения почты
+        data["avatar_path"] = avatar_path
+        data["form_data"].pop("avatar", None)  # Сам файл в Redis не кладется
+
+    # Сохранение кода и данных в Redis с заданным временем жизни
+    cache.set(f"verification:{email}", data, timeout=expiry)
+
+    return code
+
+def load_verification_data(email):
+    """Загрузка данных из Redis по email"""
+    return cache.get(f"verification:{email}")
+
+
+def delete_verification_data(email):
+    """Удаление данных (после успешной верификации или истечения срока)"""
+    data = cache.get(f"verification:{email}")
+    if data and "avatar_path" in data:
+        # Удаление временного файла, если он остался
+        default_storage.delete(data["avatar_path"])
+    cache.delete(f"verification:{email}")
+
+
+class SignUpView(View):
+    """Регистрация нового пользователя с подтверждением email-а"""
+    def get(self, request):
+        form = SignUpForm()
+        return render(request, "auth/signup.html", {"form": form})
+
+    def post(self, request):
+        form = SignUpForm(request.POST, request.FILES)
+        if form.is_valid():
+            email = form.cleaned_data["email"]
+
+            # Генерация кода и сохранение данных формы в Redis
+            code = save_verification_code(email, form.cleaned_data)
+
+            send_mail(
+                subject="Подтверждение регистрации",
+                message=f"Ваш код подтверждения: {code}."
+                        f" Код действителен в течение 30 минут.",
+                from_email="noreply@recipesite.com",
+                recipient_list=[email],
+            )
+
+            messages.info(request, "Код подтверждения был отправлен на ваш email.")
+            return redirect("verify_email", email=email)
+
+        return render(request, "auth/signup.html", {"form": form})
+
+
+class VerifyEmailView(View):
+    """Проверка введённого пользователем кода для подтверждения email-а"""
+    def get(self, request, email):
+        """Отображение страницы для ввода кода"""
+        return render(request, "auth/verify_email.html", {"email": email})
+
+    def post(self, request, email):
+        """Обработка введенного кода и создание пользователя в случае совпадения"""
+        entered_code = request.POST.get("code")  # Введенный пользователем код
+        data = cache.get(f"verification:{email}")  # Получение данных из Redis
+
+        if not data:
+            return JsonResponse({"success": False, "error": "Срок действия кода истёк."})
+
+        if entered_code == data["code"]:
+            form_data = data["form_data"]
+
+            # Создание пользователя с основными полями, без аватара
+            # create_user автоматически хэширует пароль и сохраняет объект в базе
+            user = User.objects.create_user(
+                email=form_data["email"],
+                nickname=form_data["nickname"],
+                bio=form_data.get("bio", ""),
+                password=form_data["password1"]
+            )
+
+            # Перенос аватара, если пользователь его загрузил
+            avatar_path = data.get("avatar_path")
+            if avatar_path:
+                # Открытие временного файла из папки tmp
+                with default_storage.open(avatar_path, "rb") as f:
+                    # Сохранение файла в поле avatar
+                    # avatar.save() автоматически сохраняет модель
+                    user.avatar.save(os.path.basename(avatar_path), f)
+                default_storage.delete(avatar_path)  # Чистка временного файла
+
+            # Удаление кода из Redis
+            cache.delete(f"verification:{email}")
+            cache.delete(f"verification:{email}")
+            return JsonResponse({"success": True})
+
+        # Если коды не совпадают
+        return JsonResponse({"success": False, "error": "Неверный код"})
+
+
+# Вьюха для проверки уникальности никнейма на фронте
+def check_nickname(request):
+    nickname = request.GET.get("nickname", "").strip()
+    exists = User.objects.filter(nickname__iexact=nickname).exists()
+    return JsonResponse({"exists": exists})
 
 
