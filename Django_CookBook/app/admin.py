@@ -1,0 +1,44 @@
+from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import User, Recipe, RecipeRating, Category
+
+
+class RecipeRatingInline(admin.TabularInline):
+    model = RecipeRating
+    extra = 1
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    model = User
+    list_display = ("email", "nickname", "is_staff", "is_superuser")
+    ordering = ("email",)
+    search_fields = ("email", "nickname")
+
+    # Настройка невозможности редактирования/удаления
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'dish_name', 'text', 'author', 'category', 'created_at', 'average_rating')
+    list_filter = ('category', 'created_at')
+    search_fields = ('dish_name', 'description', 'author__email')
+    readonly_fields = ('created_at', 'updated_at')
+    inlines = [RecipeRatingInline]
+
+    def average_rating(self, obj):
+        return obj.average_rating()
+
+    average_rating.short_description = 'Средний рейтинг'
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "category")
+    search_fields = ("category",)
+    ordering = ("category",)
