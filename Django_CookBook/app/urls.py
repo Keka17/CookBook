@@ -1,11 +1,14 @@
+from tempfile import template
+
 from django.contrib.auth.views import LoginView, LogoutView
-from django.urls import path
+from django.urls import path, reverse_lazy
 from django.views.generic import TemplateView
 
 from .views import (BestRecipes, SearchRecipe, CreateRecipe, UpdateRecipe, DeleteRecipe,
                     FavoritesListView, MyRecipesListView, UserProfileView, SignUpView, VerifyEmailView,
-                    ProfileUpdateView, recipe, rate_recipe, add_to_favorites, profile_view,
-                    delete_account, check_nickname)
+                    ProfileUpdateView, CustomPasswordResetView, CustomPasswordResetConfirmView,
+                    recipe, rate_recipe, add_to_favorites, profile_view, delete_account, check_nickname)
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="main.html"), name="main"),
@@ -34,4 +37,9 @@ urlpatterns = [
     path("signup/", SignUpView.as_view(), name="signup"),
     path("verify_email/<str:email>/", VerifyEmailView.as_view(), name="verify_email"),
     path("ajax/check-nickname/", check_nickname, name="check_nickname"),
+
+    # Сброс пароля
+    path("password_reset", CustomPasswordResetView.as_view(), name="password_reset"),
+    path("reset/<uidb64>/<token>", CustomPasswordResetConfirmView.as_view(), name="password_reset_confirm"),
+
 ]

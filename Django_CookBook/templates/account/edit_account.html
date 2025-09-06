@@ -160,68 +160,6 @@
         font-size: 16px;
     }
 
-    .password-group {
-        margin-top: 25px;
-    }
-
-    .password-change-btn {
-        display: block;
-        width: 140px;
-        padding: 8px 8px;
-        border: 1px solid black;
-        border-radius: 5px;
-        text-align: center;
-        background-color: rgb(102, 13, 12);
-        color: rgb(246, 246, 246);
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-        font-size: 14px;
-        font-weight: bold;
-        text-decoration: none;
-        cursor: pointer;
-    }
-
-    .password-change-btn:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
-    }
-
-    .password-input {
-        width: calc(100% - 140px);
-        display: inline-block;
-        padding: 8px 10px;
-        border: 1px solid #ccc;
-        border-radius: 6px 0 0 6px;
-        background: #f8f8f8;
-        font-size: 16px;
-        height: 30px;
-    }
-
-    .password-button {
-        display: block;
-        width: 140px;
-        padding: 8px 10px;
-        margin-top: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background-color: rgb(102, 13, 12);
-        color: rgb(246, 246, 246);
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-        font-size: 14px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .password-button:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
-    }
-
-    .password-hints {
-        font-size: 12px;
-        color: #666;
-        margin-top: 5px;
-    }
-
     .submit-btn {
         display: block;
         margin-left: auto;
@@ -382,7 +320,10 @@
                     <img src="/media/avatars/default.png" alt="avatar" class="account-avatar" id="avatar-preview">
                 {% endif %}
 
-                {{ form.avatar }}
+                <!-- Вместо {{ form.avatar }}, чтобы не было “Currently”, “Change”, “Clear”
+                - дефолтные элементы для ImageField/FileField -->
+                <input type="file" id="id_avatar" name="avatar" accept="image/*" style="display:none;">
+
 
                 <!-- Проверка на наличие недефолтного аватара-->
                 {% if form.instance.avatar %}
@@ -432,14 +373,6 @@
                 {% if form.bio.errors %}
                     <div class="account-form-error">{{ form.bio.errors }}</div>
                 {% endif %}
-            </div>
-
-            <!-- Пароль -->
-            <div class="password-group">
-                <a href="#" class="password-change-btn">Сменить пароль</a>
-                <div class="password-hints">
-                    Мы перенаправим вас на форму смены пароля (реализуем позже)
-                </div>
             </div>
 
             <!-- Сохранить -->

@@ -1,4 +1,6 @@
 import os
+
+from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.core.cache import cache
@@ -517,3 +519,30 @@ def check_nickname(request):
     return JsonResponse({"exists": exists})
 
 
+class CustomPasswordResetView(PasswordResetView):
+    """Отправка ссылки на сброс пароля"""
+    email_template_name = "auth/password_reset_email.html"
+    subject_template_name = "auth/password_reset_subject.txt"
+    success_url = reverse_lazy("login")  # Перенаправляем после успешного сброса пароля
+
+    def post(self, request, *args, **kwargs):
+        # Получение email-а из POST-запроса
+        email = request.POST.get("email")
+
+        if not email:
+            return JsonResponse({"success": False, "error": "Введите email"})
+
+        # Проверка на существование пользователя с таким email в БД
+        # Возвращаем успех даже если  пользователя с таким email не существует
+        # Безопасный ход - не раскрываются зарегестрированные email
+
+        if User.objects.filter(email=email).exists():
+            # Если email есть в базе — шлём письмо через стандартную механику
+            super().post(request, *args, **kwargs)
+
+        return JsonResponse({"success": True})
+
+
+class CustomPasswordResetConfirmView(PasswordResetConfirmView):
+    template_name = "auth/password_reset_confirm.html"
+    success_url = reverse_lazy("login")
