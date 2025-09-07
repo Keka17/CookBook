@@ -107,6 +107,17 @@ class SignUpForm(forms.ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        """Конструктор формы - при регистрации показываются все поля, в т.ч. password1 и password2.
+           В режиме редактирования профиля (пользователь существует в БД) убираются поля ввода паролей,
+           иначе форма требовала бы их повторный ввод, без которого невозможно отредактировать профиль"""
+        super().__init__(*args, **kwargs)
+
+        # instance.pk - проверка на существование пользователя
+        if self.instance and self.instance.pk:
+            self.fields.pop("password1")
+            self.fields.pop("password2")
+
     def clean_email(self):
         """Проверка уникальности email"""
         email = self.cleaned_data.get("email")

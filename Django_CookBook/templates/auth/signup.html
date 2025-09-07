@@ -150,7 +150,7 @@
     }
 
     .submit-btn {
-        display: block;
+        display: inline-block;
         margin-left: auto;
         margin-top: 30px;
         background-color: rgb(102, 13, 12);
@@ -169,7 +169,6 @@
          transform: scale(1.1);
          text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
     }
-
     .password-wrapper {
         position: relative;
         width: 100%;
@@ -290,8 +289,10 @@
                     </div>
                     <div class="live-error" id="password-match-error"></div>
                 </div>
-
-                <button type="submit" class="submit-btn">Присоединиться к миру безупречной выпечки!</button>
+                
+                <div style="text-align: center;">
+                    <button type="submit" class="submit-btn">Присоединиться к миру безупречной выпечки!</button>
+                </div>
 
             </form>
         </div>
@@ -359,7 +360,7 @@
     function showError(input, message) {
         const errorDiv = input.closest(".account-form-group").querySelector(".live-error");
         errorDiv.textContent = message || "";
-        errorDiv.style.color = message ? "#ad1517" : "";
+        errorDiv.style.color = message ? "#b51619ff" : "";
     }
 
     // ----- Элементы формы -----
@@ -379,49 +380,62 @@
 
     // ----- Функции валидации -----
     async function validateNickname() {
-    const v = nickname.value.trim();
-    if (!v) {
-        showError(nickname, "");
-        return false;
-    }
-    if (!/^[A-ZА-ЯЁ]/.test(v.charAt(0))) {
-        showError(nickname, "Никнейм должен начинаться с заглавной буквы!");
-        return false;
-    }
-
-    // AJAX-проверка уникальности
-    try {
-        const response = await fetch(`/ajax/check-nickname/?nickname=${encodeURIComponent(v)}`);
-        const data = await response.json();
-        if (data.exists) {
-            showError(nickname, "Такой никнейм уже занят!");
+        const v = nickname.value.trim();
+        if (!v) {
+            showError(nickname, "");
             return false;
         }
-    } catch (err) {
-        console.error("Ошибка проверки ника:", err);
+        if (!/^[A-ZА-ЯЁ]/.test(v.charAt(0))) {
+            showError(nickname, "Никнейм должен начинаться с заглавной буквы!");
+            return false;
+        }
+
+        // AJAX-проверка уникальности
+        try {
+            const response = await fetch(`/ajax/check-nickname/?nickname=${encodeURIComponent(v)}`);
+            const data = await response.json();
+            if (data.exists) {
+                showError(nickname, "Такой никнейм уже занят!");
+                return false;
+            }
+        } catch (err) {
+            console.error("Ошибка проверки ника:", err);
+        }
+
+        showError(nickname, "");
+        return true;
     }
 
-    showError(nickname, "");
-    return true;
-}
 
-
-
-   function validateEmail() {
+    async function validateEmail() {
         const v = email.value.trim();
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
         if (!v) {
-            showError(email, "");  // не показывать ошибку, пока пусто
+            showError(email, "");
             return false;
         }
         if (!emailRegex.test(v)) {
             showError(email, "Введите корректный email!");
             return false;
         }
+
+        // AJAX-проверка уникальности
+        try {
+            const response = await fetch(`/ajax/check-email/?email=${encodeURIComponent(v)}`);
+            const data = await response.json();
+            if (data.exists) {
+                showError(email, "Пользователь с таким email уже существует!");
+                return false;
+            }
+        } catch (err) {
+            console.error("Ошибка проверки email:", err);
+        }
+
         showError(email, "");
         return true;
     }
+
 
     function validateBio() {
         const v = bio.value.trim();
@@ -477,6 +491,7 @@
         const errorDiv = document.getElementById("password-match-error");
         if (password1.value && password2.value && password1.value !== password2.value) {
             errorDiv.textContent = "Пароли не совпадают.";
+            errorDiv.style.color = "#b51619ff";
             return false;
         }
         errorDiv.textContent = "";

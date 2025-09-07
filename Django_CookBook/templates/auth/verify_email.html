@@ -50,12 +50,40 @@
 
     .form-error,
     .live-error {
-        color: #b30000;
+        color: #b51619ff;
         font-size: 13px;
         margin-top: 5px;
         min-height: 18px;
     }
 
+    .submit-btn {
+        display: inline-block;
+        margin-left: auto;
+        margin-top: 30px;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .submit-btn:hover {
+         transform: scale(1.1);
+         text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
+    }
+
+    /* Вес id больше, чем у css-класса */
+    #resend-btn {
+        margin-top: -10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 </style>
 {% endblock %}
 
@@ -75,29 +103,36 @@
             <label class="form-label" for="id_code">Код подтверждения</label>
             <input type="text" id="id_code" name="code" maxlength="6" class="form-input form-control" placeholder="------" required>
             <div class="live-error" id="code-error"></div>
+
+            <!-- По умолчанию скрыта: появляется после истечения времени жизни первого кода-->
+            <div id="resend-status"></div>
+                <button type="button" id="resend-btn" class="submit-btn" style="display: none;">
+                    Отправить код повторно
+                </button>
         </form>
 
     </div>
 </div>
 
-{% block extra_js %}
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const codeInput = document.getElementById("id_code");
     const errorDiv = document.getElementById("code-error");
     const form = document.querySelector("form");
 
+    // ----- Проверка кода по мере ввода -----
     codeInput.addEventListener("input", () => {
-        // Оставляем только цифры и максимум 6 символов
+        // Разрешаем только цифры и максимум 6 символов
         codeInput.value = codeInput.value.replace(/[^0-9]/g, "").slice(0, 6);
         errorDiv.textContent = "";
 
-        // Если длина 6 → проверяем код
+        // Если длина 6 → проверяем код на сервере
         if (codeInput.value.length === 6) {
             checkCode(codeInput.value);
         }
     });
 
+    // ----- Функция проверки соотвествия кода -----
     function checkCode(code) {
         const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
         const email = "{{ email }}";  // передается из контекста шаблона
@@ -125,7 +160,49 @@ document.addEventListener("DOMContentLoaded", function() {
             errorDiv.textContent = "Ошибка сервера. Попробуйте позже.";
         });
     }
+    
+    const resendBtn = document.getElementById("resend-btn");
+    const statusDiv = document.getElementById("resend-status");
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const email = "{{ email }}"; 
+
+    // ----- Кнопка выплывает через 5 минут -----
+    setTimeout (() => {
+        resendBtn.style.display = "block";
+        resendBtn.style.opacity = 0;
+        resendBtn.style.transition = "opacity 1s";
+        setTimeout(() => resendBtn.style.opacity = 1, 50);
+    }, 300000); // 5 минут = 30 000 мс
+
+    // ----- Повторная отправка кода -----
+    resendBtn.addEventListener("click", function() {
+        resendBtn.disabled = true;
+        statusDiv.textContent = "Отправляем новый код";
+
+        fetch(`/verify_email/${email}/resend/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": csrfToken,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusDiv.style.color = "#14e31bff";
+                statusDiv.textContent = data.message;
+            } else {
+                statusDiv.style.color = "#b51619ff";
+                statusDiv.textContent = data.error;
+                resendBtn.disabled = false;
+            }
+        })
+        .catch(err => {
+            statusDiv.style.color = "#b51619ff";
+            statusDiv.textContent = "Ошибка при отправке кода";
+            resendBtn.disabled = false;
+        });
+    });
 });
 </script>
-{% endblock %}
 {% endblock %}

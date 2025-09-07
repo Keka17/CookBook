@@ -161,7 +161,7 @@
     }
 
     .submit-btn {
-        display: block;
+        display: inline-block;
         margin-left: auto;
         margin-top: 30px;
         background-color: rgb(102, 13, 12);
@@ -375,14 +375,16 @@
                 {% endif %}
             </div>
 
-            <!-- Сохранить -->
-            <button type="submit" class="submit-btn">Сохранить изменения</button>
+             <div style="text-align: center;">
+                <button type="submit" class="submit-btn">Сохранить изменения</button>
+             </div>
+
         </form>
     </div>
 </div>
 
 
-    <!---Кнопка "Назад", возврат к прошлой странице-->
+    <!--- Кнопка "Назад", возврат к прошлой странице -->
     <div class="bottom-actions">
         <div class="back-button">
             <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
@@ -459,15 +461,15 @@
                     if (!field.value.trim()) {
                         field.setAttribute("placeholder", placeholder);
                     }
-            });
-        }
-    });
+                });
+            }
+        });
 
     // ----- Проверка и вывод ошибки -----
     function showError(input, message) {
         const errorDiv = input.closest(".account-form-group").querySelector(".live-error");
         errorDiv.textContent = message || "";
-        errorDiv.style.color = message ? "#ad1517" : "";
+        errorDiv.style.color = message ? "#b51619ff" : "";
     }
 
      // ----- Элементы формы для изменения -----

@@ -105,8 +105,8 @@ class User(AbstractUser):
     email = models.EmailField(unique=True)  # Email как основной логин
     nickname = models.CharField(max_length=60, unique=True, verbose_name="Никнейм")
     bio = models.TextField(blank=True, verbose_name="Биография")
-    avatar = models.ImageField(upload_to="avatars/", default="avatars/default.png",
-                               verbose_name="Аватар")
+    avatar = models.ImageField(blank=True, upload_to="avatars/",
+                               default="avatars/default.png", verbose_name="Аватар")
     is_staff = models.BooleanField(default=False)  # Доступ в админку 
     is_superuser = models.BooleanField(default=False)  # Полный доступ
 

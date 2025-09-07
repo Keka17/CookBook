@@ -42,7 +42,7 @@ body {
 .navbar a:hover,
 .navbar a:focus,
 .navbar a:active {
-    transform: scale(1.2);
+    transform: scale(1.1);
     color: white;
     text-shadow: 0 0 8px rgba(200, 189, 176, 1);
 }

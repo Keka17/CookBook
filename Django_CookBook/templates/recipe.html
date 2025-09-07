@@ -71,8 +71,8 @@
         background: white;
         padding: 15px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        min-height: 200px;
-        max-height: 80vh;
+        min-height: 400px;
+        max-height: 100vh;
         overflow-y: auto;
     }
 
@@ -259,7 +259,6 @@
 <div id="login-modal" class="modal">
     <div class="modal-content">
         <h2>Действие доступно только зарегистрированным пользователям</h2>
-        <!-- Ссылки поменяю позже -->
         <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'signup'%}">зарегистрируйтесь</a>.</p>
         <button id="close-modal">Закрыть</button>
     </div>
