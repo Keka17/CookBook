@@ -7,7 +7,7 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        margin-top: 40px;
+        margin-top: 100px;
         padding: 20px;
     }
 
@@ -30,13 +30,6 @@
         color: #2E2E2E;
     }
 
-    .form-label {
-        font-weight: bold;
-        margin-bottom: 8px;
-        display: block;
-        text-align: left;
-    }
-
     .form-input {
         width: 100%;
         padding: 10px;
@@ -48,16 +41,31 @@
         margin-bottom: 10px;
     }
 
-    .form-error,
-    .live-error {
-        color: #b51619ff;
-        font-size: 13px;
-        margin-top: 5px;
-        min-height: 18px;
+    /* Стили сообщений об ошибках */
+    .message {
+        font-family: 'Roboto', sans-serif;
+        font-size: 14px;
+        font-weight: bold;
+        font-style: italic;
+        padding: 10px 12px;
+        display: inline-block;
+        max-width: 100%;
+    }
+
+    .message--error {
+        color: #b51619;
+    }
+
+    .message--success {
+        color: #0c730fff;
+    }
+
+    .message--info {
+        color: #b89a74ff;
     }
 
     .submit-btn {
-        display: inline-block;
+        display: block;
         margin-left: auto;
         margin-top: 30px;
         background-color: rgb(102, 13, 12);
@@ -79,10 +87,7 @@
 
     /* Вес id больше, чем у css-класса */
     #resend-btn {
-        margin-top: -10px;
-        display: flex;
         justify-content: center;
-        align-items: center;
     }
 </style>
 {% endblock %}
@@ -100,12 +105,11 @@
         <form method="post" novalidate>
             {% csrf_token %}
 
-            <label class="form-label" for="id_code">Код подтверждения</label>
             <input type="text" id="id_code" name="code" maxlength="6" class="form-input form-control" placeholder="------" required>
-            <div class="live-error" id="code-error"></div>
+            <div id="code-error" class="message" style="display: none;"></div>
 
             <!-- По умолчанию скрыта: появляется после истечения времени жизни первого кода-->
-            <div id="resend-status"></div>
+            <div id="resend-status" class="message" style="display:none;"></div>
                 <button type="button" id="resend-btn" class="submit-btn" style="display: none;">
                     Отправить код повторно
                 </button>
@@ -120,6 +124,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const errorDiv = document.getElementById("code-error");
     const form = document.querySelector("form");
 
+
+    function showMessage(element, text, type) {
+        element.textContent = text;
+        element.style.display = "block";
+        element.className = `message message--${type}`;
+    }
+
+    function hideMessage(element) {
+        element.textContent = "";
+        element.style.display = "none";
+    }
+
     // ----- Проверка кода по мере ввода -----
     codeInput.addEventListener("input", () => {
         // Разрешаем только цифры и максимум 6 символов
@@ -129,6 +145,13 @@ document.addEventListener("DOMContentLoaded", function() {
         // Если длина 6 → проверяем код на сервере
         if (codeInput.value.length === 6) {
             checkCode(codeInput.value);
+        }
+
+        // Поле очистилось → сообщение пропадает 
+        if (codeInput.value.length === 0) {
+            hideMessage(errorDiv);
+        } else {
+            hideMessage(errorDiv);
         }
     });
 
@@ -152,12 +175,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 window.location.href = "{% url 'login' %}";
             } else {
                 // Если код неверный → вывод ошибки
-                errorDiv.textContent = "Неверный код. Попробуйте ещё раз.";
+                showMessage(errorDiv, data.error || "Неверный код. Попробуйте ещё раз.", "error");
             }
         })
         .catch(err => {
             console.error(err);
-            errorDiv.textContent = "Ошибка сервера. Попробуйте позже.";
+            showMessage(errorDiv, "Ошибка сервера. Попробуйте позже.", "error");
         });
     }
     
@@ -167,17 +190,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const email = "{{ email }}"; 
 
     // ----- Кнопка выплывает через 5 минут -----
-    setTimeout (() => {
+    function showResendButton() {
         resendBtn.style.display = "block";
         resendBtn.style.opacity = 0;
         resendBtn.style.transition = "opacity 1s";
         setTimeout(() => resendBtn.style.opacity = 1, 50);
-    }, 300000); // 5 минут = 30 000 мс
+    }
+    setTimeout(showResendButton, 300000); // 5 минут = 300 000 мс
 
     // ----- Повторная отправка кода -----
     resendBtn.addEventListener("click", function() {
         resendBtn.disabled = true;
-        statusDiv.textContent = "Отправляем новый код";
+        showMessage(statusDiv, "Отправляем новый код...", "info");
 
         fetch(`/verify_email/${email}/resend/`, {
             method: "POST",
@@ -189,17 +213,24 @@ document.addEventListener("DOMContentLoaded", function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                statusDiv.style.color = "#14e31bff";
-                statusDiv.textContent = data.message;
+                showMessage(statusDiv, data.message, "success");
+
+                // Скрытие кнопки и запуск таймера заново
+                resendBtn.style.display = "none";
+                setTimeout(showResendButton, 300000);
+
+                // Перезагрузка страницы - форма ввода кода без resendBtn
+                setTimeout(() => {
+                    window.location.href = `/verify_email/${email}/`;
+                }, 100); // 100 мс =  0.1 сек
+
             } else {
-                statusDiv.style.color = "#b51619ff";
-                statusDiv.textContent = data.error;
+                showMessage(statusDiv, data.error, "error");
                 resendBtn.disabled = false;
             }
         })
         .catch(err => {
-            statusDiv.style.color = "#b51619ff";
-            statusDiv.textContent = "Ошибка при отправке кода";
+            showMessage(statusDiv, "Ошибка при отправке кода", "error");
             resendBtn.disabled = false;
         });
     });
