@@ -24,20 +24,29 @@
         font-size: 15px;
     }
 
+     .search-form input:focus {
+        border-color: #8b5e3c;
+        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
+        outline: none;
+     }
+
     .search-form button {
         background-color: rgb(118, 0, 2);
-        color: white;
-        border: none;
+        color: rgb(246, 246, 246);
+        border: 1px solid black;
+        border-radius: 5px;
         padding: 8px 15px;
         border-radius: 5px;
-        cursor: default;
+        cursor: pointer;
         font-size: 15px;
-        transition: all 0.3s ease;
+        font-weight: bold;
+        text-decoration: none;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
     }
 
     .search-form button:hover {
         transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
     }
 
     .main-content {
@@ -172,34 +181,38 @@
 
     .pagination .page-link {
         display: inline-block;
-        min-width: 36px;
-        padding: 8px 14px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background-color: white;
         color: rgb(118, 0, 2);
         font-weight: bold;
-        font-size: 15px;
-        text-align: center;
-        transition: all 0.3s ease;
+        font-size: 16px;
         text-decoration: none;
+        padding: 5px 12px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
     }
 
     .pagination .page-link:hover {
-        background-color: rgba(118, 0, 2, 0.1);
-        transform: translateY(-2px);
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
     }
 
     .pagination .active .page-link {
-        background-color: rgb(118, 0, 2);
+        background: rgb(118, 0, 2);
         color: white;
-        border-color: rgb(118, 0, 2);
+        border-color: black;
+        cursor: pointer;
+        transform: none;
+        text-shadow: none;
     }
 
     .pagination .disabled .page-link {
-        color: #999;
+        color: gray;
+        border-color: #ccc;
+        background: #f7f7f7;
         cursor: not-allowed;
-        background-color: #f8f8f8;
+        transform: none;
+        text-shadow: none;
     }
 </style>
 {% endblock %}
@@ -216,8 +229,8 @@
         <!-- Поисковая строка -->
         <div class="search-container">
             <form method="get" action="{% url 'recipe_search' %}" class="search-form">
-            <input type="text" name="q" placeholder="Введите название блюда" value="{{ search_query }}">
-            <button type="submit">Найти</button>
+                <input type="text" name="q" placeholder="Введите название блюда" value="{{ search_query }}">
+                <button type="submit ">Найти</button>
             </form>
         </div>
 

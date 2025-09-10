@@ -1,5 +1,6 @@
 {% extends 'default.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block extra_css %}
 <style>
@@ -67,6 +68,13 @@
         font-size: 14px;
     }
 
+
+    .form-input:focus {
+        border-color: #8b5e3c;
+        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
+        outline: none;
+    }
+
     .account-form-error,
     .account-live-error {
         color: #b30000;
@@ -81,6 +89,12 @@
         border: 1px solid #a77b5d;
         border-radius: 4px;
         background-color: #fff9f0;
+    }
+
+    .form-control:focus {
+        border-color: #8b5e3c;
+        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
+        outline: none;
     }
 
 
@@ -211,7 +225,7 @@
                 <!-- Никнейм -->
                 <div class="account-form-group">
                     <label class="account-form-label">{{ form.nickname.label }}</label>
-                    {{ form.nickname}}
+                    {{ form.nickname|add_class:"form-input" }}
                     <div class="live-error"></div>
 
                     {% if form.nickname.errors %}
@@ -222,7 +236,7 @@
                 <!-- Биография -->
                 <div class="account-form-group">
                     <label class="account-form-label">{{ form.bio.label }}</label>
-                    {{ form.bio }}
+                    {{ form.bio|add_class:"form-input" }}
                     <small style="font-size: 12px; color: #777;">
                         Данный раздел можно заполнить позже.
                     </small>
@@ -251,7 +265,7 @@
                  <!-- Email -->
                 <div class="account-form-group">
                     <label class="account-form-label">{{ form.email.label }}</label>
-                    {{ form.email }}
+                    {{ form.email|add_class:"form-input" }}
                         <small style="font-size: 12px; color: #777;">
                             На этот адрес придет письмо с подтверждающим кодом.
                         </small>

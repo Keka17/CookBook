@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     'django_ckeditor_5',
     'django_cleanup.apps.CleanupConfig',  # Для удаления файлов из media/
     'storages',
+    'widget_tweaks',  # Стилизация форм
 ]
 
 MIDDLEWARE = [
@@ -67,7 +68,7 @@ DATABASES = {
     }
 }
 
-# Коды верификации хранятся в кэше Redis
+# Коды верификации и данные формы хранятся в кэше Redis
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",

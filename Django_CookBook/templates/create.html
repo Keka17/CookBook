@@ -1,5 +1,6 @@
 {% extends 'default.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block extra_css %}
 <style>
@@ -13,7 +14,9 @@
     .create-left {
         width: 40%;
         margin-left: 30px;
-        margin-top: 80px;
+        position: sticky;
+        top: 20px;
+        align-self: flex-start;
     }
 
     .create-left img {
@@ -24,7 +27,7 @@
     .create-rules {
         font-size: 16px;
         line-height: 1.5;
-        padding: 20px;
+        padding: 15px;
         border: 1px solid #a77b5d;
         background-color: #fcf8eb;
         border-radius: 10px;
@@ -60,8 +63,8 @@
 
     label {
         font-weight: bold;
+        margin-bottom: 5px;
         display: block;
-        margin-bottom: 8px;
     }
 
     /* Единый стиль подсказок и placeholder */
@@ -80,6 +83,16 @@
         border: 1px solid #a77b5d;
         border-radius: 4px;
         background-color: #fff9f0;
+    }
+
+    .form-input {
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .form-input:focus {
+        border-color: #8b5e3c;
+        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
+        outline: none;
     }
 
     /* Увеличенные поля */
@@ -125,6 +138,35 @@
         text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
     }
 
+    .back-button {
+        margin-top: 30px;
+        text-align: center;
+
+    }
+
+    .back-button a {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 16px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .back-button a:hover {
+         transform: scale(1.1);
+         text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+    .extra-back-btn {
+        margin-bottom: 30px;
+        position: relative;
+    }
 
 
 </style>
@@ -159,31 +201,31 @@
 
              <div class="form-group">
                 {{ form.dish_name.label_tag }}
-                {{ form.dish_name }}
+                {{ form.dish_name|add_class:"form-input"  }}
                  <div class="live-error"></div>
             </div>
 
             <div class="form-group">
                 {{ form.picture.label_tag }}
-                {{ form.picture }}
+                {{ form.picture|add_class:"form-input" }}
                 <div class="live-error"></div>
             </div>
 
             <div class="form-group">
                 {{ form.category.label_tag }}
-                {{ form.category }}
+                {{ form.category|add_class:"form-input" }}
                 <div class="live-error"></div>
             </div>
 
             <div class="form-group">
                 {{ form.description.label_tag }}
-                {{ form.description }}
+                {{ form.description|add_class:"form-input" }}
                 <div class="live-error"></div>
             </div>
 
             <div class="form-group">
                 {{ form.text.label_tag }}
-                {{ form.text }}
+                {{ form.text|add_class:"form-input" }}
                 <div class="live-error"></div>
             </div>
 
@@ -193,6 +235,14 @@
         </form>
     </div>
 </div>
+
+<div class="extra-back-btn">
+    <!---Кнопка "Назад", возврат к прошлой странице-->
+    <div class="back-button">
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+    </div>
+</div>
+
 
 <!-- Динамическая валидация -->
 <script>

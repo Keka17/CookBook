@@ -31,7 +31,7 @@ class BestRecipes(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        """Фильтрация рецептов с рейтингом >= 4.7.
+        """Фильтрация рецептов с рейтингом >= 4.5
         Сортировка по убыванию; возможность фильтрации по категориям"""
 
         # Базовый queryset с аннотациями среднего рейтинга и количества оценок
@@ -39,7 +39,7 @@ class BestRecipes(ListView):
             average_rating=Avg("ratings__rating"),
             rating_count=Count("ratings")
         ).filter(
-            average_rating__gte=4.7).order_by("-created_at")
+            average_rating__gte=4.5).order_by("-created_at")
 
         # Фильтрацию по категориям через GET-запрос
         category_id = self.request.GET.get("category")
@@ -491,9 +491,17 @@ class VerifyEmailView(View):
 
         # Проверка наличия формы
         if not stored_data:
+            avatar_path = request.POST.get("avatar_path")
+            if avatar_path:
+                try:
+                    default_storage.delete(avatar_path)
+                except Exception as e:
+                    print(f"Ошибка при удалении временного аватара: {e}")
+
             return JsonResponse({
                 "success": False,
-                "error": "Данные формы не найдены. Попробуйте зарегестрироваться снова."})
+                "error": "Данные формы не найдены. Попробуйте зарегестрироваться снова."
+            })
 
         form_data = stored_data.get("form_data", {})
 
@@ -517,19 +525,6 @@ class VerifyEmailView(View):
             bio=form_data.get("bio", ""),
             password=form_data["password1"]
         )
-
-        # Перенос аватара, если пользователь его загрузил
-        avatar_path = form_data.get("avatar_path")
-        if avatar_path:
-            try:
-                user.avatar.save(
-                    os.path.basename(avatar_path),
-                    default_storage.open(avatar_path)
-                )
-                default_storage.delete(avatar_path)  # Удаление временного аватара
-            except Exception as e:
-                print(f"Ошибка при сохранении аватара: {e}")
-
         # Удаляем данные формы и код из Redis
         delete_verification_data(email)
 

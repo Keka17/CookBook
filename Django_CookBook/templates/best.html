@@ -127,36 +127,40 @@
         list-style: none;
     }
 
-    .pagination .page-link {
+   .pagination .page-link {
         display: inline-block;
-        min-width: 36px;
-        padding: 8px 14px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        background-color: white;
         color: rgb(118, 0, 2);
         font-weight: bold;
-        font-size: 15px;
-        text-align: center;
-        transition: all 0.3s ease;
+        font-size: 16px;
         text-decoration: none;
+        padding: 5px 12px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
     }
 
     .pagination .page-link:hover {
-        background-color: rgba(118, 0, 2, 0.1);
-        transform: translateY(-2px);
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
     }
 
     .pagination .active .page-link {
-        background-color: rgb(118, 0, 2);
+        background: rgb(118, 0, 2);
         color: white;
-        border-color: rgb(118, 0, 2);
+        border-color: black;
+        cursor: pointer;
+        transform: none;
+        text-shadow: none;
     }
 
     .pagination .disabled .page-link {
-        color: #999;
+        color: gray;
+        border-color: #ccc;
+        background: #f7f7f7;
         cursor: not-allowed;
-        background-color: #f8f8f8;
+        transform: none;
+        text-shadow: none;
     }
 
     .empty-message {
@@ -187,7 +191,7 @@
             <div class="recipe-card">
                 <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name }}">
                 <div class="recipe-title">{{ recipe.dish_name }}</div>
-                <div class="recipe-rating">Рейтинг: <b>{{ recipe.average_rating }} </b>⭐️</div>
+                <div class="recipe-rating">Рейтинг: <b>{{ recipe.average_rating|floatformat:1 }} </b>⭐️</div>
                 <div>{{ recipe.preview }}</div>
                 <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
             </div>
