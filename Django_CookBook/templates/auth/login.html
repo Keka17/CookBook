@@ -27,7 +27,7 @@
         position: relative;
     }
 
-    .login-form-error {
+    .form-error {
         color: #b51619;
         padding: 10px 12px;
         margin: 12px 0;
@@ -40,7 +40,7 @@
         margin-left: 100px;
     }
 
-    .login-form-box {
+    .form-box {
         width: 420px;
         margin: 20px auto;
         background-color: #fdf5e6;
@@ -50,7 +50,7 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
 
-    .login-form-title {
+    .form-title {
         text-align: center;
         font-size: 24px;
         font-weight: bold;
@@ -59,18 +59,18 @@
         color: rgb(102, 13, 12);
     }
 
-    .login-form-group {
+    .form-group {
         margin-bottom: 25px;
     }
 
-    .login-form-label {
+    .form-label {
         font-weight: bold;
         margin-bottom: 8px;
         display: block;
         color: #3e2c20;
     }
 
-    .login-form-input {
+    .form-input {
         width: 100%;
         padding: 12px 14px;
         border: 1px solid #a77b5d;
@@ -80,13 +80,13 @@
         transition: border-color 0.3s ease, box-shadow 0.3s ease;
     }
 
-    .login-form-input:focus {
+    .form-input:focus {
         border-color: #8b5e3c;
         box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
         outline: none;
     }
 
-    .login-form-error {
+    .form-error {
         color: #b51619;
         font-size: 13px;
         margin-top: 6px;
@@ -188,31 +188,31 @@
         </div>
 
         <!-- Правая часть: форма входа -->
-        <div class="login-form-box">
-            <h2 class="login-form-title">Вход</h2>
+        <div class="form-box">
+            <h2 class="form-title">Вход</h2>
 
             <form method="post">
                 {% csrf_token %}
 
                 <!-- Ошибки формы -->
                 {% if form.errors %}
-                    <div class="login-form-error" role="alert" aria-live="polite">
+                    <div class="form-error" role="alert" aria-live="polite">
                         <strong>Ошибка входа:</strong> проверьте правильность введённых данных.
                     </div>
                 {% endif %}
 
-                <div class="login-form-group">
+                <div class="form-group">
                     <label for="id_username" class="form-label">Email</label>
                     <input type="email" name="username" id="id_username"
-                    class="login-form-input" required
+                    class="form-input" required
                     value="{{ form.username.value|default:'' }}">
                 </div>
 
                 <!-- Пароль с глазиком -->
-                <div class="login-form-group" style="position: relative;">
+                <div class="form-group" style="position: relative;">
                     <label for="id_password" class="form-label">Пароль</label>
                     <input type="password" name="password" id="id_password"
-                           class="login-form-input" required>
+                           class="form-input" required>
                     <button type="button" class="password-toggle" onclick="togglePassword()">👁️</button>
                 </div>
 

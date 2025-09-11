@@ -28,6 +28,9 @@ class Recipe(models.Model):
                                    verbose_name="Описание блюда")
     text = CKEditor5Field(verbose_name="Шаги приготовления")
 
+    notified_saved = models.BooleanField(default=False, verbose_name="Уведомление о 500 сохранениях отправлено")
+    notified_top = models.BooleanField(default=False, verbose_name="Уведомление о топе отправлено")
+
     def __str__(self):
         return self.dish_name
 

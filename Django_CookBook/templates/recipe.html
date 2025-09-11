@@ -176,6 +176,25 @@
         text-align: center;
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
+
+    .close-btn {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 14px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .close-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
 </style>
 {% endblock %}
 
@@ -259,8 +278,9 @@
 <div id="login-modal" class="modal">
     <div class="modal-content">
         <h2>Действие доступно только зарегистрированным пользователям</h2>
-        <p>Пожалуйста, <a href="{% url 'login' %}">войдите</a> или <a href="{% url 'signup'%}">зарегистрируйтесь</a>.</p>
-        <button id="close-modal">Закрыть</button>
+        <p>Пожалуйста, <a href="{% url 'login' %}" style="color:#7a160d; font-weight: bold;">войдите</a>
+            или <a href="{% url 'signup'%}" style="color:#7a160d; font-weight: bold;">зарегистрируйтесь</a>.</p>
+        <button id="close-modal" class="close-btn">Закрыть</button>
     </div>
 </div>
 

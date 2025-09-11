@@ -1,6 +1,3 @@
-import os
-
-from asgiref.timeout import timeout
 from django.contrib.auth.views import PasswordResetView, PasswordResetConfirmView
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -31,7 +28,7 @@ class BestRecipes(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        """Фильтрация рецептов с рейтингом >= 4.5
+        """Фильтрация рецептов с рейтингом > 4.7
         Сортировка по убыванию; возможность фильтрации по категориям"""
 
         # Базовый queryset с аннотациями среднего рейтинга и количества оценок
@@ -39,7 +36,7 @@ class BestRecipes(ListView):
             average_rating=Avg("ratings__rating"),
             rating_count=Count("ratings")
         ).filter(
-            average_rating__gte=4.5).order_by("-created_at")
+            average_rating__gte=4.7).order_by("-created_at")
 
         # Фильтрацию по категориям через GET-запрос
         category_id = self.request.GET.get("category")

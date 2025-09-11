@@ -14,6 +14,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1']
 
+SITE_ID = 1
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -22,12 +23,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    'django.contrib.sites',
+
     'app',
     'django_ckeditor_5',
     'django_cleanup.apps.CleanupConfig',  # Для удаления файлов из media/
     'storages',
     'widget_tweaks',  # Стилизация форм
+    # 'app.apps.RecipesConfig',  # Сигналы
 ]
 
 MIDDLEWARE = [
@@ -69,6 +72,7 @@ DATABASES = {
 }
 
 # Коды верификации и данные формы хранятся в кэше Redis
+# Кэш Redis (db=1)
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
@@ -79,6 +83,17 @@ CACHES = {
     }
 }
 
+# Настройки Celery для асинхронной обработки задач
+# Redis используется в качестве брокера сообщений и бэкенда для хранения результатов
+# Для кэша и Celery используются разные БД с разными id
+# Celery (отдельная база db=0)
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Все задачи сериализуются в JSON для обеспечения совместимости
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
