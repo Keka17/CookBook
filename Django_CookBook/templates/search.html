@@ -63,6 +63,15 @@
         overflow-y: auto;
     }
 
+    .sidebar-image {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .sidebar-image img {
+        max-width: 90%;
+    }
+
     .sidebar-title {
         color: #2E2E2E;
         font-style: italic;
@@ -229,7 +238,7 @@
         <!-- Поисковая строка -->
         <div class="search-container">
             <form method="get" action="{% url 'recipe_search' %}" class="search-form">
-                <input type="text" name="q" placeholder="Введите название блюда" value="{{ search_query }}">
+                <input type="text" name="q" placeholder="Введите название блюда или имя автора" value="{{ search_query }}">
                 <button type="submit ">Найти</button>
             </form>
         </div>
@@ -320,6 +329,10 @@
             </li>
             {% endfor %}
         </ul>
+
+        <div class="sidebar-image">
+            <img src="{% static 'pictures/search_girl.png' %}"/>
+        </div>
     </div>
 </div>
 

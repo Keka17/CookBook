@@ -30,7 +30,7 @@ def notify_recipe_saved(recipe_id):
         logger.error(f"Рецепт с id={recipe_id} не найден")
         return False
 
-    if not recipe.notified_saved and recipe.favorite_set.count() > 2:
+    if not recipe.notified_saved and recipe.favorite_set.count() > 500:
         current_site = Site.objects.get_current()
         url = f"https://{current_site.domain}{recipe.get_absolute_url()}"
         subject = "Поздравляем с безупречным рецептом!"
@@ -46,7 +46,7 @@ def notify_recipe_saved(recipe_id):
 
 @shared_task
 def notify_recipe_top_rated(recipe_id):
-    """Уведомление на почту: рецепт попат в том (рейтинг > 4.7)"""
+    """Уведомление на почту: рецепт попал в топ (рейтинг > 4.7)"""
     try:
         recipe = Recipe.objects.get(id=recipe_id)
     except Recipe.DoesNotExist:

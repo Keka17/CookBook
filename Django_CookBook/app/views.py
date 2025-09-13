@@ -5,6 +5,7 @@ from django.core.cache import cache
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.core.mail import send_mail
+from django.core.exceptions import PermissionDenied
 
 
 from .models import Recipe, User, Category, RecipeRating, Favorite
@@ -191,6 +192,13 @@ def rate_recipe(request, pk):
     """Обработка оценки рецепта авторизованным пользователем;
     функция создает или обновляет оценку"""
     recipe = get_object_or_404(Recipe, pk=pk)
+    
+    # Автор не может оценить свой рецепт
+    if recipe.author == request.user :
+        return JsonResponse({
+            "status": "error",
+            "message": "Вы не можете оценить свой рецепт."
+        }) 
 
     # Получение оценки из POST-запроса
     rating_value = int(request.POST.get("rating"))
@@ -207,9 +215,17 @@ def rate_recipe(request, pk):
 
 @login_required
 def add_to_favorites(request, pk):
-    """Обработка AJAX-запроса для добавления/удаления рецепта из изрбанного
-    с проверкой на авторизованность"""
+    """Обработка AJAX-запроса для добавления/удаления рецепта из избранного
+    с проверкой на авторизованность и авторство"""
     recipe = get_object_or_404(Recipe, pk=pk)
+    
+    # Автор не может сохранить свой рецепт
+    if recipe.author == request.user :
+        return JsonResponse({
+            "status": "error",
+            "message": "Вы не можете добавить свой рецепт в избранное."
+        }) 
+        
     favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
 
     if not created:
@@ -264,7 +280,7 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         """Проверка на возможность редактирования - только обладатель аккаунта"""
-        user = self.get_object()  # Получение пользоваиеля по slug из URL
+        user = self.get_object()  # Получение пользователя по slug из URL
         return self.request.user == user
 
     def get_form(self, form_class=None):
@@ -292,6 +308,11 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 def profile_view(request, nickname):
     """"Личный кабинет пользователя"""
     profile_user = get_object_or_404(User, nickname=nickname)
+    
+    # Проверка: зашел ли пользователь в свой кабинет
+    # В случае исключения ⭢ переход на страницу 403.html
+    if request.user.nickname != nickname:
+        raise PermissionDenied
 
     # Опубликованные пользователем рецепты (последние 4)
     my_recipes = Recipe.objects.filter(author=profile_user).order_by("-created_at")[:4]
@@ -316,12 +337,19 @@ def delete_account(request):
         return JsonResponse({"success": True})
     return JsonResponse({"success": False}, status=400)
 
-class FavoritesListView(ListView):
+class FavoritesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Избранные рецепты пользователя с фильтрацией по категориям"""
     model = Recipe
     template_name = "account/favorites.html"
     context_object_name = "recipes"
     paginate_by = 8
+    
+    raise_exception = True  # Залогиненного пользователя переносят на ошибку 403
+    
+    def test_func(self):
+        """Только владелец профиля может просматривать избранное"""
+        profile_user = get_object_or_404(User, nickname=self.kwargs.get("nickname"))
+        return self.request.user == profile_user
 
     def get_queryset(self):
         """Выбор избранных рецептов с фильтрацией по категориям"""
@@ -350,12 +378,19 @@ class FavoritesListView(ListView):
         return context
 
 
-class MyRecipesListView(ListView):
+class MyRecipesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Опубликованные рецепты пользователя с фильтрацией по категориям"""
     model = Recipe
     template_name = "account/my_recipes.html"
     context_object_name = "recipes"
     paginate_by = 8
+    
+    raise_exception = True  # Залогиненного пользователя переносят на ошибку 403
+    
+    def test_func(self):
+        """Только владелец профиля может просматривать избранное"""
+        profile_user = get_object_or_404(User, nickname=self.kwargs.get("nickname"))
+        return self.request.user == profile_user
 
     def get_queryset(self):
         """Опубликованные рецепты с фильтрацией по категориям"""
@@ -595,3 +630,17 @@ class CustomPasswordResetView(PasswordResetView):
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = "auth/password_reset_confirm.html"
     success_url = reverse_lazy("login")
+    
+
+def tr_handler403(request, exception):
+    """Обработка ошибки 403"""
+    return render(request=request, template_name="errors/403.html", status=403)
+
+def tr_handler404(request, exception):
+    """Обработка ошибки 404"""
+    return render(request=request, template_name="errors/404.html", status=404)
+
+def tr_handler500(request):
+    """Обработка ошибки 500"""
+    return render(request=request, template_name="errors/500.html", status=500)
+    

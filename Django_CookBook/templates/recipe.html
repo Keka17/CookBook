@@ -1,3 +1,4 @@
+
 {% extends 'default.html' %}
 {% load static %}
 
@@ -211,46 +212,55 @@
         <div>
             <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name }}" class="recipe-photo">
 
-            <div class="rating-block">
-                <strong>Ваша оценка:</strong>
-                {% if user.is_authenticated %}
-                <form id="rating-form" method="post" action="{% url 'rate_recipe' recipe.pk %}">
-                    {% csrf_token %}
-                    <div class="star-rating">
-                        {% for i in "12345" %}
-                            <span class="star {% if user_rating and user_rating >= forloop.counter %}selected{% endif %}"
-                                data-value="{{ forloop.counter }}">&#9733;</span>
-                        {% endfor %}
-                    </div>
-                </form>
-                {% else %}
-
-                <div class="star-rating">
+           <div class="rating-block">
+    {% if user.is_authenticated %}
+        {% if recipe.author != user %}
+            <!-- Зарегистрированный пользователь, не автор -->
+            <strong>Ваша оценка:</strong>
+            <form id="rating-form" method="post" action="{% url 'rate_recipe' recipe.pk %}">
+                {% csrf_token %}
+                <div class="star-rating user-rating">
                     {% for i in "12345" %}
-                        <span class="star" data-value="{{ forloop.counter }}">&#9733;</span>
+                        <span class="star {% if user_rating and user_rating >= forloop.counter %}selected{% endif %}"
+                              data-value="{{ forloop.counter }}">&#9733;</span>
                     {% endfor %}
                 </div>
-                {% endif %}
-                <div class="average-rating">
-                    Средняя оценка: <span id="average-rating">{{ recipe.average_rating|default:"0" }}</span> ⭐
-                </div>
-            </div>
+            </form>
+        {% endif %}
+    {% else %}
+        <!-- Незарегистрированный пользователь -->
+        <strong>Ваша оценка:</strong>
+        <div class="star-rating guest-rating">
+            {% for i in "12345" %}
+                <span class="star" data-value="{{ forloop.counter }}">&#9733;</span>
+            {% endfor %}
+        </div>
+    {% endif %}
 
-            <div class="recipe-actions">
+    <div class="average-rating">
+        Средняя оценка: <span id="average-rating"><strong>{{ recipe.average_rating|default:"0" }}</strong></span> ⭐
+    </div>
+</div>
 
-                <a href="#" id="favorite-btn" class="recipe-btn"
-                data-url="{% url 'add_to_favorites' recipe.pk  %}">
-                    {% if user.is_authenticated %}
-                        {% if is_favorite %}
-                            В избранном ✓
-                        {% else %}
-                            Сохранить в избранное
-                        {% endif %}
-                    {% else %}
-                        Сохранить в избранное
+<div class="recipe-actions">
+    {% if user.is_authenticated %}
+        {% if recipe.author != user %}
+            <a href="#" id="favorite-btn" class="recipe-btn" data-url="{% url 'add_to_favorites' recipe.pk %}">
+                {% if is_favorite %}
+                    В избранном ✓
+                {% else %}
+                    Сохранить в избранное
                 {% endif %}
-                </a>
-            </div>
+            </a>
+        {% endif %}
+    {% else %}
+        <!-- Незарегистрированный пользователь -->
+        <a href="#" id="favorite-btn" class="recipe-btn guest-btn">
+            Сохранить в избранное
+        </a>
+    {% endif %}
+</div>
+
 
             <div class="recipe-info">
                 Автор: <a href="{% url 'user_profile' recipe.author.pk%}" class="author-link">
@@ -258,6 +268,7 @@
                 </a>
                 <p>Опубликовано <strong>{{ recipe.created_at|date:"d.m.Y" }}</strong></p>
             </div>
+
         </div>
 
         <!-- Правая колонка -->
@@ -267,24 +278,23 @@
         </div>
     </div>
 
-    <!---Кнопка "Назад", возврат к прошлой странице-->
-    <div class="back-button">
-        <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+        <!---Кнопка "Назад", возврат к прошлой странице-->
+        <div class="back-button">
+            <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+        </div>
+
+        </div>
+
+    <!-- Модальное окно -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Действие доступно только зарегистрированным пользователям</h2>
+            <p>Пожалуйста, <a href="{% url 'login' %}" style="color:#7a160d; font-weight: bold;">войдите</a>
+                или <a href="{% url 'signup'%}" style="color:#7a160d; font-weight: bold;">зарегистрируйтесь</a>.</p>
+            <button id="close-modal" class="close-btn">Закрыть</button>
+        </div>
     </div>
 
-    </div>
-
-<!-- Модальное окно -->
-<div id="login-modal" class="modal">
-    <div class="modal-content">
-        <h2>Действие доступно только зарегистрированным пользователям</h2>
-        <p>Пожалуйста, <a href="{% url 'login' %}" style="color:#7a160d; font-weight: bold;">войдите</a>
-            или <a href="{% url 'signup'%}" style="color:#7a160d; font-weight: bold;">зарегистрируйтесь</a>.</p>
-        <button id="close-modal" class="close-btn">Закрыть</button>
-    </div>
-</div>
-
-<!-- AJAX-запросы -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
     const stars = document.querySelectorAll(".star-rating .star");

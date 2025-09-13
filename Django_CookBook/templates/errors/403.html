@@ -1,0 +1,84 @@
+{% load static %}
+
+{% block extra_css %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f2ead7;
+        font-family: 'Roboto', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .main-content {
+        text-align: center;
+        max-width: 900px;
+        padding: 40px 20px;
+    }
+
+    .text {
+        font-family: 'Roboto', sans-serif;
+        font-style: italic;
+        font-size: 28px;
+        font-weight: bold;
+        line-height: 1.5;
+        color: #7a160d;
+        margin-bottom: 30px;
+    }
+
+    .quote {
+        font-family: 'Playfair Display', serif;
+        font-style: italic;
+        font-size: 32px;
+        font-weight: 700;
+        color: #2E2E2E;
+        margin: 25px auto;
+        display: block;
+    }
+
+    .bree-gif {
+        width: 550px; 
+        max-width: 80%;
+        height: auto;
+        border-radius: 12px;
+        margin: 30px auto;
+        display: block;
+    }
+
+    a {
+        color: #7a160d;
+        text-decoration: underline;
+        font-weight: 700;
+    }
+
+</style>
+{% endblock %}
+
+<head>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <title>Ошибка доступа: 403</title>
+</head>
+{% block content %}
+<div class="main-content">
+    <div class="text">
+        Вы пытались проникнуть туда, куда не положено.  
+        <br>Как сказала бы Бри Ван де Камп:
+    </div>
+
+    <blockquote class="quote">
+        "Порядок — это не просто слово.  
+        Это закон, и вы его нарушили."
+    </blockquote>
+
+    <img src="{% static '403.gif' %}" alt="Ошибка доступа" class="bree-gif">
+
+    <div class="text">
+        Пожалуйста, вернитесь на 
+        <a href="{% url 'main' %}">главную страницу</a>  
+        и действуйте в рамках правил.
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'default.html' %}
 {% load static %}
+{% load widget_tweaks %}
 
 {% block extra_css %}
 <style>
@@ -126,6 +127,13 @@
         border-radius: 6px;
         font-size: 14px;
     }
+
+    .form-input:focus {
+        border-color: #8b5e3c;
+        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
+        outline: none;
+    }
+
 
     .account-form-error {
         color: #b30000;
@@ -348,7 +356,7 @@
             <!-- Email -->
             <div class="account-form-group">
                 <label class="account-form-label">{{ form.email.label }}</label>
-                {{ form.email }}
+                {{ form.email|add_class:"form-input" }}
                 <div class="live-error"></div>
 
                 {% if form.email.errors %}
@@ -367,7 +375,7 @@
             <!-- Биография -->
             <div class="account-form-group">
                 <label class="account-form-label">{{ form.bio.label }}</label>
-                {{ form.bio }}
+                {{ form.bio|add_class:"form-input" }}
                 <div class="live-error"></div>
 
                 {% if form.bio.errors %}

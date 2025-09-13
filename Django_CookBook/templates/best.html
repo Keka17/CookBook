@@ -108,6 +108,15 @@
         overflow-y: auto;
     }
 
+    .sidebar-image {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    .sidebar-image img {
+        max-width: 90%;
+    }
+
     .sidebar-title {
         color: #2E2E2E;
         font-style: italic;
@@ -266,7 +275,12 @@
         </li>
         {% endfor %}
     </ul>
-</div>
+
+    <div class="sidebar-image">
+        <img src="{% static 'pictures/_girl.png' %}"/>
+    </div>
+        
+    </div>
 </div>
 
 <script>

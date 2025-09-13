@@ -167,6 +167,25 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
 
+    .close-btn {
+        display: inline-block;
+        color: rgb(118, 0, 2);
+        font-weight: bold;
+        font-size: 14px;
+        text-decoration: none;
+        padding: 5px 10px;
+        margin-top: 10px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background: white;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+    }
+
+    .close-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
 </style>
 {% endblock %}
 
@@ -233,7 +252,7 @@
 <div id="resetModal" class="modal" style="display:none;">
   <div class="modal-content">
     <p id="resetMessage"></p>
-    <button onclick="closeModal()">ОК</button>
+    <button onclick="closeModal()" class="close-btn">ОК</button>
   </div>
 </div>
 

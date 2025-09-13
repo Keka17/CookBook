@@ -1,0 +1,56 @@
+{% load static %}
+
+{% block extra_css %}
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background-color: #f2ead7;
+        font-family: 'Roboto', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+    }
+
+    .main-content {
+        text-align: center;
+        max-width: 900px;
+        padding: 40px 20px;
+    }
+
+    .text {
+        font-family: 'Roboto', sans-serif;
+        font-style: italic;
+        font-size: 28px;
+        font-weight: bold;
+        line-height: 1.5;
+        color: #7a160d;
+        margin-bottom: 30px;
+    }
+
+    .bree-gif {
+        width: 550px; 
+        max-width: 80%;
+        height: auto;
+        border-radius: 12px;
+        margin: 30px auto;
+        display: block;
+    }
+
+</style>
+{% endblock %}
+
+<head>
+    <link rel="icon" href="{% static 'favicon.png' %}" type="image/png">
+    <title>Страница не найдена: 404</title>
+</head>
+{% block content %}
+<div class="main-content">
+    <div class="text">
+        «Хаос начинается там, где вещи не на своих местах.
+        А вы, похоже, ищете то, чего вовсе не существует.»
+    </div>
+     <img src="{% static '404.gif' %}" alt="Страница не найдена" class="bree-gif">
+</div>
+{% endblock %}
