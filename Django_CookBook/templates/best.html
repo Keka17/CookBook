@@ -283,29 +283,4 @@
     </div>
 </div>
 
-<script>
-    // Подгрузка рецептов при скролле вниз
-    let loading = false;
-    window.addEventListener('scroll', function() {
-        if (!loading && (window.innerHeight + window.scrollY) >= document.body.offsetHeight - 100) {
-            const nextPage = document.querySelector('#pagination a');
-            if (nextPage) {
-                loading = true;
-                fetch(nextPage.href)
-                    .then(response => response.text())
-                    .then(data => {
-                        const parser = new DOMParser();
-                        const htmlDoc = parser.parseFromString(data, 'text/html');
-                        const newRecipes = htmlDoc.querySelector('#recipe-list').innerHTML;
-                        document.querySelector('#recipe-list').innerHTML += newRecipes;
-
-                        const newPagination = htmlDoc.querySelector('#pagination').innerHTML;
-                        document.querySelector('#pagination').innerHTML = newPagination;
-
-                        loading = false;
-                    });
-            }
-        }
-    });
-</script>
 {% endblock %}
