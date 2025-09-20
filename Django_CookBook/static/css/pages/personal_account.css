@@ -1,0 +1,54 @@
+.see-all-btn {
+    font-family: 'Roboto', sans-serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 18px;
+    display: inline-block;
+    color: rgb(118, 0, 2);
+    text-decoration: none;
+    padding: 0px 10px;
+    margin-left: 450px;
+    transition: transform 0.3s ease,
+    text-shadow 0.3s ease;
+    white-space: nowrap;
+}
+
+.see-all-btn:hover {
+    transform: scale(1.1);
+    text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+}
+
+.account-container {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    height: calc(100vh - 60px);
+    background-color: #f2ead7;
+    padding: 30px 30px 30px 30px;
+    margin-bottom: 60px;
+    align-items: start;
+  }
+
+  .account-right {
+    margin-top: -25px;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin: 25px 0 15px;
+    gap: 15px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: bold;
+    color: rgb(118, 0, 2);
+    font-size: 22px;
+    white-space: nowrap; /* Запрещаем перенос текста */
+    flex-shrink: 0;
+  }
+ 
+

@@ -1,0 +1,48 @@
+.girl {
+    max-width: 80%;
+    height: auto;
+    position: absolute;
+    top: 100px;
+    left: 20px;
+}
+
+#id_email {
+    height: 30px;
+    width: 100%;
+    font-size: 16px;
+}
+
+#id_nickname {
+    height: 30px;
+    font-size: 16px;
+}
+
+.password-hints {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.password-hints li.valid {
+    color: green;
+    font-weight: bold;
+}
+
+.password-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.avatar-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}

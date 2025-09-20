@@ -1,0 +1,51 @@
+.verify-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin-top: 100px;
+    padding: 20px;
+}
+
+.verify-box {
+    width: 420px;
+    background-color: #fdf5e6;
+    padding: 40px;
+    border: 1px solid #a77b5d;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+/* Стили сообщений об ошибках */
+.message {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    font-style: italic;
+    padding: 10px 12px;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.message--error {
+    color: #b51619;
+}
+
+.message--success {
+    color: #0c730fff;
+}
+
+.message--info {
+    color: #b89a74ff;
+}
+
+.btn-center {
+    display: block !important;
+    margin: 20px auto 0;
+}
+
+#id_code {
+    text-align: center;
+    font-size: 24px; 
+    letter-spacing: 5px; 
+}

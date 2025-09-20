@@ -1,0 +1,55 @@
+    .btn {
+        display: inline-block;
+        font-weight: bold;
+        font-size: 15px;
+        border: 1px solid black;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: transform 0.3s ease, text-shadow 0.3s ease;
+        text-decoration: none;
+    }
+    
+    .primary-btn {
+        color: rgb(118, 0, 2);
+        padding: 5px 10px;
+        margin-top: 10px;
+        background: white;
+    }
+
+   .submit-btn {
+        margin-left: auto;
+        margin-top: 20px;
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        padding: 10px 20px;
+    }
+
+    .avatar-btn {
+        background-color: rgb(102, 13, 12);
+        color: rgb(246, 246, 246);
+        padding: 8px 8px;
+        margin: 10px auto 0;
+        margin-top: 10px;
+        font-size: 14px;
+    }
+
+    .primary-btn:hover,
+    .submit-btn:hover,
+    .avatar-btn:hover {
+        transform: scale(1.1);
+        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+    }
+
+    .back-button {
+        margin-top: 30px;
+        text-align: center;
+    }
+
+    
+
+
+
+
+    
+
+

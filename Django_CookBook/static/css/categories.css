@@ -1,0 +1,36 @@
+.category-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.category-list li {
+    margin-bottom: 10px;
+    transition: transform 0.3s ease;
+}
+
+.category-list li:hover {
+    transform: scale(1.05);
+}
+
+.category-list a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    font-style: italic;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.category-list li:hover a {
+    transform: scale(1.1);
+    text-shadow: 0 0 8px rgba(255,255,255,1);
+}
+
+.active-category {
+    color: white !important;
+    background-color: #7a160d;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
+}

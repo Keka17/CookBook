@@ -2,100 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<style>
-    .verify-container {
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        margin-top: 100px;
-        padding: 20px;
-    }
-
-    .verify-box {
-        width: 420px;
-        background-color: #fdf5e6;
-        padding: 40px;
-        border: 1px solid #a77b5d;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        text-align: center;
-    }
-
-    .citation {
-        font-family: 'Playfair Display', serif;
-        font-style: italic;
-        font-weight: bold;
-        font-size: 22px;
-        margin-bottom: 25px;
-        color: #2E2E2E;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 10px;
-        font-size: 18px;
-        letter-spacing: 8px;
-        text-align: center;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        margin-bottom: 10px;
-    }
-
-    .form-input:focus {
-        border-color: #8b5e3c;
-        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
-        outline: none;
-    }
-
-    /* Стили сообщений об ошибках */
-    .message {
-        font-family: 'Roboto', sans-serif;
-        font-size: 14px;
-        font-weight: bold;
-        font-style: italic;
-        padding: 10px 12px;
-        display: inline-block;
-        max-width: 100%;
-    }
-
-    .message--error {
-        color: #b51619;
-    }
-
-    .message--success {
-        color: #0c730fff;
-    }
-
-    .message--info {
-        color: #b89a74ff;
-    }
-
-    .submit-btn {
-        display: block;
-        margin-left: auto;
-        margin-top: 30px;
-        background-color: rgb(102, 13, 12);
-        color: rgb(246, 246, 246);
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: bold;
-        text-decoration: none;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-        cursor: pointer;
-    }
-
-    .submit-btn:hover {
-         transform: scale(1.1);
-         text-shadow: 0 0 8px rgba(255, 255, 255, 0.9);
-    }
-
-    /* Вес id больше, чем у css-класса */
-    #resend-btn {
-        justify-content: center;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/verify_email.css' %}">
 {% endblock %}
 
 {% block navbar %}
@@ -116,7 +23,7 @@
 
             <!-- По умолчанию скрыта: появляется после истечения времени жизни первого кода-->
             <div id="resend-status" class="message" style="display:none;"></div>
-                <button type="button" id="resend-btn" class="submit-btn" style="display: none;">
+                <button type="button" id="resend-btn" class="btn submit-btn btn-center" style="display: none;">
                     Отправить код повторно
                 </button>
         </form>

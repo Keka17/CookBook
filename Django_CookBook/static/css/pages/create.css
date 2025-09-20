@@ -1,0 +1,88 @@
+.create-container {
+    display: flex;
+    background-color: #f2ead7;
+    padding: 20px;
+    gap: 20px;
+}
+
+.create-left {
+    width: 40%;
+    margin-left: 30px;
+    position: sticky;
+    top: 20px;
+    align-self: flex-start;
+}
+
+.create-left img {
+    max-width: 70%;
+    height: auto;
+}
+
+.create-rules {
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 15px;
+    border: 1px solid #a77b5d;
+    background-color: #fcf8eb;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.create-rules em {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 20px;
+    color: rgb(118, 0, 2);
+}
+
+.create-right {
+    width: 50%;
+    background-color: #fdf5e6;
+    padding: 20px;
+    border: 1px solid #a77b5d;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.create-right h2 {
+    text-align: center;
+    color: #7b0000;
+    margin-bottom: 20px;
+}
+
+
+/* Единый стиль подсказок и placeholder */
+::placeholder,
+.helptext {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #888;
+    opacity: 1;
+}
+
+.form-input {
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Увеличенные поля */
+#id_dish_name {
+    height: 50px;
+    font-size: 18px;
+}
+
+#id_description {
+    min-height: 120px;
+    font-size: 16px;
+}
+
+/* Стили для CKEditor5 */
+.ck-editor {
+    width: 100% !important;
+}
+
+.ck-editor__editable {
+    min-height: 500px !important;
+    background-color: #fff9f0 !important;
+    border: 1px solid #a77b5d !important;
+}

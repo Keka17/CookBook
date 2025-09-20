@@ -3,200 +3,7 @@
 {% load static %}
 
 {% block extra_css %}
-<style>
-    .recipe-title {
-        font-family: 'Playfair Display', serif;
-        font-style: italic;
-        font-weight: bold;
-        font-size: 35px;
-        color: rgb(118, 0, 2);
-        margin-top: 10px;
-        text-align: center;
-    }
-
-    .recipe-container {
-        display: grid;
-        grid-template-columns: 1fr 1.5fr;
-        gap: 20px;
-        background-color: #f2ead7;
-        padding: 20px;
-        border-radius: 10px;
-    }
-
-    .recipe-photo {
-        width: 100%;
-        object-fit: cover;
-        border: none;
-        border-radius: 10px;
-        background: white;
-        box-shadow: 10px 10px 10px rgba(0,0,0,0.1);
-    }
-
-    .recipe-info {
-       margin-top: 10px;
-    }
-
-    .author-link {
-        font-family: 'Playfair Display', serif;
-        font-style: italic;
-        font-weight: bold;
-        font-size: 20px;
-        color: rgb(118, 0, 2);
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-        transform-origin: left center;
-    }
-
-    .author-link:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(118, 0, 2, 0.3);
-    }
-
-    .recipe-description {
-        font-size: 16px;
-        line-height: 1.3;
-        background-color: white;
-        border: none;
-        border-radius: 10px;
-        background: white;
-        padding: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-
-    }
-
-    .recipe-text {
-        margin-top: 10px;
-        border: none;
-        border-radius: 10px;
-        background: white;
-        padding: 15px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        min-height: 400px;
-        max-height: 100vh;
-        overflow-y: auto;
-    }
-
-    .recipe-actions {
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-    }
-
-    .recipe-btn {
-        display: inline-block;
-        color: rgb(118, 0, 2);
-        font-weight: bold;
-        text-decoration: none;
-        padding: 5px 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background: white;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-    .recipe-btn:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    .recipe-author {
-        margin-top: 10px;
-        font-size: 16px;
-    }
-
-    .rating-block {
-        margin-top: 10px;
-    }
-
-    .star-rating {
-        display: inline-block;
-    }
-
-    .star {
-        font-size: 30px;
-        color: #ccc;
-        cursor: pointer;
-        transition: color 0.2s, transform 0.2s;
-    }
-
-    .star:hover,
-    .star.hovered {
-        color: gold;
-        transform: scale(1.2);
-    }
-
-    .star.selected {
-        color: gold;
-    }
-
-    .back-button {
-        margin-top: 30px;
-        text-align: center;
-
-    }
-
-    .back-button a {
-        display: inline-block;
-        color: rgb(118, 0, 2);
-        font-weight: bold;
-        font-size: 16px;
-        text-decoration: none;
-        padding: 5px 10px;
-        margin-top: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background: white;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-    .back-button a:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    /* Модальное окно */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        backdrop-filter: blur(5px);
-        background-color: rgba(0,0,0,0.5);
-    }
-
-    .modal-content {
-        background-color: white;
-        margin: 15% auto;
-        padding: 20px;
-        border-radius: 10px;
-        width: 400px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    }
-
-    .close-btn {
-        display: inline-block;
-        color: rgb(118, 0, 2);
-        font-weight: bold;
-        font-size: 14px;
-        text-decoration: none;
-        padding: 5px 10px;
-        margin-top: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background: white;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-    .close-btn:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/recipe.css' %}">
 {% endblock %}
 
 {% block navbar %}
@@ -245,7 +52,7 @@
 <div class="recipe-actions">
     {% if user.is_authenticated %}
         {% if recipe.author != user %}
-            <a href="#" id="favorite-btn" class="recipe-btn" data-url="{% url 'add_to_favorites' recipe.pk %}">
+            <a href="#" id="favorite-btn" class="btn primary-btn" data-url="{% url 'add_to_favorites' recipe.pk %}">
                 {% if is_favorite %}
                     В избранном ✓
                 {% else %}
@@ -255,7 +62,7 @@
         {% endif %}
     {% else %}
         <!-- Незарегистрированный пользователь -->
-        <a href="#" id="favorite-btn" class="recipe-btn guest-btn">
+        <a href="#" id="favorite-btn" class="btn primary-btn guest-btn">
             Сохранить в избранное
         </a>
     {% endif %}
@@ -280,18 +87,18 @@
 
         <!---Кнопка "Назад", возврат к прошлой странице-->
         <div class="back-button">
-            <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+            <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn primary-btn">← Назад</a>
         </div>
 
         </div>
 
     <!-- Модальное окно -->
-    <div id="login-modal" class="modal">
+    <div id="login-modal" class="modal" style="display:none;">
         <div class="modal-content">
             <h2>Действие доступно только зарегистрированным пользователям</h2>
             <p>Пожалуйста, <a href="{% url 'login' %}" style="color:#7a160d; font-weight: bold;">войдите</a>
                 или <a href="{% url 'signup'%}" style="color:#7a160d; font-weight: bold;">зарегистрируйтесь</a>.</p>
-            <button id="close-modal" class="close-btn">Закрыть</button>
+            <button id="close-modal" class="btn primary-btn">Закрыть</button>
         </div>
     </div>
 

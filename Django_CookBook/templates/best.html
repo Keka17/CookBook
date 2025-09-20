@@ -1,192 +1,6 @@
 {% extends 'default.html' %}
 {% load static %}
 
-{% block extra_css %}
-<style>
-    .recipe-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 0.8fr);
-        gap: 20px;
-        flex: 1;
-    }
-
-    .recipe-card {
-        border: none;
-        border-radius: 10px;
-        background: white;
-        padding: 15px;
-        text-align: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .recipe-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-    }
-
-    .recipe-card img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-    }
-
-    .recipe-title {
-        font-style: italic;
-        font-weight: bold;
-        font-size: 20px;
-        color: rgb(118, 0, 2);
-        margin-top: 10px;
-    }
-
-    .recipe-btn {
-        display: inline-block;
-        color: rgb(118, 0, 2);
-        font-weight: bold;
-        font-size: 14px;
-        text-decoration: none;
-        padding: 5px 10px;
-        margin-top: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background: white;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-    .recipe-btn:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    .recipe-btn:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(237, 228, 218, 0.9);
-    }
-
-    .category-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-
-    .category-list li {
-        margin-bottom: 10px;
-        transition: transform 0.3s ease;
-    }
-
-    .category-list li:hover {
-        transform: scale(1.05);
-    }
-
-    .category-list a {
-        text-decoration: none;
-        color: white;
-        font-size: 18px;
-        font-style: italic;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-
-    .category-list li:hover a {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(255,255,255,1);
-    }
-
-    .active-category {
-        color: white !important;
-        background-color: #7a160d;
-        padding: 5px 10px;
-        border-radius: 5px;
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    .sidebar {
-        position: sticky;
-        top: 0;
-        border-radius: 10px 0 0 10px;
-        height: 100vh ;
-        overflow-y: auto;
-    }
-
-    .sidebar-image {
-        margin-top: 30px;
-        text-align: center;
-    }
-
-    .sidebar-image img {
-        max-width: 90%;
-    }
-
-    .sidebar-title {
-        color: #2E2E2E;
-        font-style: italic;
-    }
-
-    .pagination {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-        margin-top: 30px;
-        flex-wrap: wrap;
-        padding: 0;
-    }
-
-    .pagination li {
-        list-style: none;
-    }
-
-   .pagination .page-link {
-        display: inline-block;
-        color: rgb(118, 0, 2);
-        font-weight: bold;
-        font-size: 16px;
-        text-decoration: none;
-        padding: 5px 12px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background: white;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-    .pagination .page-link:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    .pagination .active .page-link {
-        background: rgb(118, 0, 2);
-        color: white;
-        border-color: black;
-        cursor: pointer;
-        transform: none;
-        text-shadow: none;
-    }
-
-    .pagination .disabled .page-link {
-        color: gray;
-        border-color: #ccc;
-        background: #f7f7f7;
-        cursor: not-allowed;
-        transform: none;
-        text-shadow: none;
-    }
-
-    .empty-message {
-        grid-column: 1 / -1; /* занимает всю ширину сетки */
-        text-align: center;
-        align-self: center;
-        justify-self: center;
-        font-style: italic;
-        color: gray;
-        font-size: 18px;
-        padding: 40px 0;
-    }
-
-</style>
-{% endblock %}
-
-
 {% block navbar %}
     {% include "includes/navbars/main_navbar.html" %}
 {% endblock %}
@@ -195,17 +9,17 @@
 <div class="main-content">
     <!-- Основная область с рецептами -->
     <div class="content-area">
-        <div class="recipe-grid" id="recipe-list">
+        <div class="recipe-grid recipe-grid--main" id="recipe-list">
             {% for recipe in recipes %}
             <div class="recipe-card">
-                <img src="{{ recipe.picture.url }}" alt="{{ recipe.dish_name }}">
-                <div class="recipe-title">{{ recipe.dish_name }}</div>
+                <img src="{{ recipe.picture.url }}" class="recipe-img recipe-img--h200" alt="{{ recipe.dish_name }}">
+                <div class="recipe-title" style="font-size: 20px;">{{ recipe.dish_name }}</div>
                 <div class="recipe-rating">Рейтинг: <b>{{ recipe.average_rating|floatformat:1 }} </b>⭐️</div>
                 <div>{{ recipe.preview }}</div>
-                <a href="{{ recipe.get_absolute_url }}" class="recipe-btn">Посмотреть рецепт</a>
+                <a href="{{ recipe.get_absolute_url }}" class="btn primary-btn">Посмотреть рецепт</a>
             </div>
             {% empty %}
-            <p class="empty-message">Пока нет опубликованных рецептов данной категории.</p>
+            <p class="empty-message">Идеальных рецептов здесь ещё нет! Исправьте это недоразумение, добавив свой шедевр.</p>
             {% endfor %}
         </div>
 
@@ -258,29 +72,29 @@
 
     <!-- Сайдбар с категориями -->
     <div class="sidebar">
-    <h3 class="sidebar-title">Сортировка по категориям</h3>
-    <ul class="category-list">
-        <li>
-            <a href="{% url 'best' %}"
-               class="{% if not request.GET.category %}active-category{% endif %}">
-                Все категории
-            </a>
-        </li>
-        {% for category in categories %}
-        <li>
-            <a href="{% url 'best' %}?category={{ category.id }}"
-               class="{% if request.GET.category|default:'' == category.id|stringformat:'s' %}active-category{% endif %}">
-                {{ category.category }}
-            </a>
-        </li>
-        {% endfor %}
-    </ul>
+        <h3 class="sidebar-title">Сортировка по категориям</h3>
+        <ul class="category-list">
+            <li>
+                <a href="{% url 'best' %}"
+                class="{% if not request.GET.category %}active-category{% endif %}">
+                    Все категории
+                </a>
+            </li>
+            {% for category in categories %}
+            <li>
+                <a href="{% url 'best' %}?category={{ category.id }}"
+                class="{% if request.GET.category|default:'' == category.id|stringformat:'s' %}active-category{% endif %}">
+                    {{ category.category }}
+                </a>
+            </li>
+            {% endfor %}
+        </ul>
 
-    <div class="sidebar-image">
-        <img src="{% static 'pictures/_girl.png' %}"/>
+        <div class="sidebar-image">
+            <img src="{% static 'pictures/_girl.png' %}"/>
+        </div> 
     </div>
-        
-    </div>
+
 </div>
 
 {% endblock %}

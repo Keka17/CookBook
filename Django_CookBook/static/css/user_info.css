@@ -1,0 +1,51 @@
+.user-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #fcf8eb;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.user-card--profile {
+    position: sticky;
+    top: 60px;
+    height: fit-content;
+    margin-bottom: 20px;
+}
+
+.user-card--account {
+    height: auto;
+}
+
+.user-img {
+    width: 100%;
+    max-width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+}
+
+.user-nickname {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 25px;
+    color: rgb(118, 0, 2);
+}
+
+.user-info {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-top: 10px;
+}
+
+.user-info--profile {
+    background-color: #faf2e1;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 80%;
+}

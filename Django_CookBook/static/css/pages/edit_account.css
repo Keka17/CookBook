@@ -1,0 +1,70 @@
+.top-girl {
+    max-width: 90%;
+    height: auto;
+    position: absolute;
+    top: 350x;
+    left: 30px;
+}
+
+.bottom-girl {
+    max-width: 100%;
+    height: auto;
+    position: absolute;
+    bottom: 220px;
+    left: 50px;
+    z-index: 2;
+}
+
+.avatar-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.avatar-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+/* Спрятать стандартную кнопку выбора файла */
+input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
+
+.right-girl {
+    max-width: 21%;
+    height: auto;
+    position: absolute;
+    top: -120px;
+    right: -20px;
+}
+
+#id_email {
+    height: 30px;
+    width: 100%;
+    font-size: 16px;
+}
+
+#id_nickname {
+    height: 30px;
+    font-size: 16px;
+}
+
+#id_bio {
+    min-height: 150px;
+    width: 100% !important;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+}
+
+.bottom-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    gap: 16px;             
+    margin-top: 20px;
+}

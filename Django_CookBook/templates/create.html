@@ -3,173 +3,7 @@
 {% load widget_tweaks %}
 
 {% block extra_css %}
-<style>
-    .create-container {
-        display: flex;
-        background-color: #f2ead7;
-        padding: 20px;
-        gap: 20px;
-    }
-
-    .create-left {
-        width: 40%;
-        margin-left: 30px;
-        position: sticky;
-        top: 20px;
-        align-self: flex-start;
-    }
-
-    .create-left img {
-        max-width: 70%;
-        height: auto;
-    }
-
-    .create-rules {
-        font-size: 16px;
-        line-height: 1.5;
-        padding: 15px;
-        border: 1px solid #a77b5d;
-        background-color: #fcf8eb;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .create-rules em {
-        font-family: 'Playfair Display', serif;
-        font-style: italic;
-        font-weight: bold;
-        font-size: 20px;
-        color: rgb(118, 0, 2);
-    }
-
-    .create-right {
-        width: 50%;
-        background-color: #fdf5e6;
-        padding: 20px;
-        border: 1px solid #a77b5d;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .create-right h2 {
-        text-align: center;
-        color: #7b0000;
-        margin-bottom: 20px;
-    }
-
-    .form-group {
-        margin-bottom: 30px;
-    }
-
-    label {
-        font-weight: bold;
-        margin-bottom: 5px;
-        display: block;
-    }
-
-    /* Единый стиль подсказок и placeholder */
-    ::placeholder,
-    .helptext {
-        font-family: 'Roboto', sans-serif;
-        font-size: 16px;
-        color: #888;
-        opacity: 1;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        border: 1px solid #a77b5d;
-        border-radius: 4px;
-        background-color: #fff9f0;
-    }
-
-    .form-input {
-        font-family: 'Roboto', sans-serif;
-    }
-
-    .form-input:focus {
-        border-color: #8b5e3c;
-        box-shadow: 0 0 10px rgba(139, 94, 60, 0.3);
-        outline: none;
-    }
-
-    /* Увеличенные поля */
-    #id_dish_name {
-        height: 50px;
-        font-size: 18px;
-    }
-
-    #id_description {
-        min-height: 120px;
-        font-size: 16px;
-    }
-
-    /* Стили для CKEditor5 */
-    .ck-editor {
-        width: 100% !important;
-    }
-
-    .ck-editor__editable {
-        min-height: 500px !important;
-        background-color: #fff9f0 !important;
-        border: 1px solid #a77b5d !important;
-    }
-
-    .submit-btn {
-        display: inline-block;
-        margin-left: auto;
-        margin-top: 20px;
-        background-color: rgb(102, 13, 12);
-        color: rgb(246, 246, 246);
-        border: 1px solid black;
-        border-radius: 5px;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: bold;
-        text-decoration: none;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-        cursor: pointer;
-    }
-
-    .submit-btn:hover {
-        transform: scale(1.1);
-        text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    .back-button {
-        margin-top: 30px;
-        text-align: center;
-
-    }
-
-    .back-button a {
-        display: inline-block;
-        color: rgb(118, 0, 2);
-        font-weight: bold;
-        font-size: 16px;
-        text-decoration: none;
-        padding: 5px 10px;
-        margin-top: 10px;
-        border: 1px solid black;
-        border-radius: 5px;
-        background: white;
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-    .back-button a:hover {
-         transform: scale(1.1);
-         text-shadow: 0 0 8px rgba(200, 189, 176, 0.9);
-    }
-
-    .extra-back-btn {
-        margin-bottom: 30px;
-        position: relative;
-    }
-
-
-</style>
+<link rel="stylesheet" href="{% static 'css/pages/create.css' %}">
 {% endblock %}
 
 {% block navbar %}
@@ -230,18 +64,19 @@
             </div>
 
             <div style="text-align: center;">
-                <button type="submit" class="submit-btn">Опубликовать рецепт</button>
+                <button type="submit" class="btn submit-btn">Опубликовать рецепт</button>
             </div>
         </form>
     </div>
 </div>
 
-<div class="extra-back-btn">
+
     <!---Кнопка "Назад", возврат к прошлой странице-->
     <div class="back-button">
-        <a href="{{ request.META.HTTP_REFERER|default:'/' }}">← Назад</a>
+        <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn primary-btn" 
+        style="margin-bottom: 30px; position: relative;">← Назад</a>
     </div>
-</div>
+
 
 
 <!-- Динамическая валидация -->

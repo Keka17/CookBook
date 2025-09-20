@@ -1,0 +1,14 @@
+.profile-container {
+    display: grid;
+    grid-template-columns: 30% 1fr auto;
+    column-gap: 20px;
+    height: calc(100vh - 60px);
+    background-color: #f2ead7;
+    padding: 20px 0 20px 20px;
+}
+
+.profile-right {
+    overflow-y: auto;
+    padding-top: 20px;
+    margin-bottom: 20px;
+}
