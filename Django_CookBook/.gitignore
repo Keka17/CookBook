@@ -1,2 +1,15 @@
-# Игнорировать временные файлы медиа
-media/tmp/
+
+venv_cb/
+__pycache__/
+media/
+*.pyc
+*.sqlite3
+.env
+.DS_Store
+*.log
+*.pyo
+*.pyd
+*.local
+.idea/
+.vscode/
+
