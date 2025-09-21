@@ -19,6 +19,7 @@
                 <div class="recipe-card" style="height: 400px;">
                     <img src="{{ recipe.picture.url }}" class="recipe-img recipe-img--h200" alt="{{ recipe.dish_name }}">
                     <div class="recipe-title" style="font-size: 20px;">{{ recipe.dish_name }}</div>
+                    <div class="recipe-rating">Рейтинг: <b>{{ recipe.average_rating|floatformat:1 }} </b>⭐️</div>
                     <a href="{{ recipe.get_absolute_url }}" class="btn primary-btn">Посмотреть рецепт</a>
 
                     <div class="recipe-buttons">
