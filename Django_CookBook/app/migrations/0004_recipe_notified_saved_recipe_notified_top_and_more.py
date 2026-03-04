@@ -6,23 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('app', '0003_favorite'),
+        ("app", "0003_favorite"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='recipe',
-            name='notified_saved',
-            field=models.BooleanField(default=False, verbose_name='Уведомление о 500 сохранениях отправлено'),
+            model_name="recipe",
+            name="notified_saved",
+            field=models.BooleanField(
+                default=False, verbose_name="Уведомление о 500 сохранениях отправлено"
+            ),
         ),
         migrations.AddField(
-            model_name='recipe',
-            name='notified_top',
-            field=models.BooleanField(default=False, verbose_name='Уведомление о топе отправлено'),
+            model_name="recipe",
+            name="notified_top",
+            field=models.BooleanField(
+                default=False, verbose_name="Уведомление о топе отправлено"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='avatar',
-            field=models.ImageField(blank=True, default='avatars/default.png', upload_to='avatars/', verbose_name='Аватар'),
+            model_name="user",
+            name="avatar",
+            field=models.ImageField(
+                blank=True,
+                default="avatars/default.png",
+                upload_to="avatars/",
+                verbose_name="Аватар",
+            ),
         ),
     ]

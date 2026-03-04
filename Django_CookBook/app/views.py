@@ -12,8 +12,13 @@ from .models import Recipe, User, Category, RecipeRating, Favorite
 from .forms import RecipeForm, SignUpForm
 from django.shortcuts import render, get_object_or_404
 from django.views import View
-from django.views.generic import (ListView, DetailView,
-                                  CreateView, UpdateView, DeleteView)
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 from django.db.models import Avg, Count, Q
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -23,6 +28,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 class BestRecipes(ListView):
     """Страница с лучшими рецептами"""
+
     model = Recipe
     template_name = "best.html"
     context_object_name = "recipes"
@@ -33,11 +39,15 @@ class BestRecipes(ListView):
         Сортировка по убыванию; возможность фильтрации по категориям"""
 
         # Базовый queryset с аннотациями среднего рейтинга и количества оценок
-        queryset = super().get_queryset().annotate(
-            average_rating=Avg("ratings__rating"),
-            rating_count=Count("ratings")
-        ).filter(
-            average_rating__gte=4.7).order_by("-created_at")
+        queryset = (
+            super()
+            .get_queryset()
+            .annotate(
+                average_rating=Avg("ratings__rating"), rating_count=Count("ratings")
+            )
+            .filter(average_rating__gte=4.7)
+            .order_by("-created_at")
+        )
 
         # Фильтрацию по категориям через GET-запрос
         category_id = self.request.GET.get("category")
@@ -49,12 +59,13 @@ class BestRecipes(ListView):
     def get_context_data(self, **kwargs):
         """Добавление всех категорий в контекст для фильтрации"""
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
+        context["categories"] = Category.objects.all()
         return context
 
 
 class SearchRecipe(ListView):
     """Класс поиска рецептов"""
+
     model = Recipe
     template_name = "search.html"
     context_object_name = "recipes"
@@ -63,10 +74,12 @@ class SearchRecipe(ListView):
     def get_queryset(self):
         """Функция возвращает queryset рецептов, отфильтрованных по
         названию блюда, никнейму автора  и категории (выбор через sidebar)"""
-        queryset = Recipe.objects.all().order_by('-created_at')
+        queryset = Recipe.objects.all().order_by("-created_at")
 
         # Получение данных из GET-запроса
-        query = self.request.GET.get("q", "").strip()  # Удаление пробелов в поисковом запросе
+        query = self.request.GET.get(
+            "q", ""
+        ).strip()  # Удаление пробелов в поисковом запросе
         category_id = self.request.GET.get("category")
 
         # Фильтрация по названию и никнейму автора
@@ -75,8 +88,8 @@ class SearchRecipe(ListView):
             normalized_query = query.capitalize()
 
             queryset = queryset.filter(
-                Q(dish_name__icontains=normalized_query) |
-                Q(author__nickname__icontains=normalized_query)
+                Q(dish_name__icontains=normalized_query)
+                | Q(author__nickname__icontains=normalized_query)
             )
 
         # Фильтрация по категории
@@ -89,15 +102,16 @@ class SearchRecipe(ListView):
         """Добавление в контекст всех категорий, поисковой запрос
         и выбранную категорию"""
         context = super().get_context_data(**kwargs)
-        context['categories'] = Category.objects.all()
-        context['search_query'] = self.request.GET.get('q', '')
-        context['selected_category'] = self.request.GET.get('category', '')
+        context["categories"] = Category.objects.all()
+        context["search_query"] = self.request.GET.get("q", "")
+        context["selected_category"] = self.request.GET.get("category", "")
 
         return context
 
 
 class CreateRecipe(LoginRequiredMixin, CreateView):
     """Создание рецепта авторизованным пользователем"""
+
     model = Recipe
     form_class = RecipeForm
     template_name = "create.html"
@@ -113,6 +127,7 @@ class CreateRecipe(LoginRequiredMixin, CreateView):
 
 class UpdateRecipe(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Редактирование рецепта только его автором"""
+
     model = Recipe
     form_class = RecipeForm
     template_name = "create.html"
@@ -133,7 +148,8 @@ class UpdateRecipe(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
         # Разрешенные поля
         allowed_fields = self.request.GET.get(
-            "fields", "description,picture,text").split(",")
+            "fields", "description,picture,text"
+        ).split(",")
 
         for field_name in list(form.fields.keys()):
             if field_name not in allowed_fields:
@@ -144,6 +160,7 @@ class UpdateRecipe(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class DeleteRecipe(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """Удаление рецепта только его автором"""
+
     model = Recipe
     template_name = "recipe_delete.html"
     success_url = reverse_lazy("my_recipes")
@@ -192,25 +209,23 @@ def rate_recipe(request, pk):
     """Обработка оценки рецепта авторизованным пользователем;
     функция создает или обновляет оценку"""
     recipe = get_object_or_404(Recipe, pk=pk)
-    
+
     # Автор не может оценить свой рецепт
-    if recipe.author == request.user :
-        return JsonResponse({
-            "status": "error",
-            "message": "Вы не можете оценить свой рецепт."
-        }) 
+    if recipe.author == request.user:
+        return JsonResponse(
+            {"status": "error", "message": "Вы не можете оценить свой рецепт."}
+        )
 
     # Получение оценки из POST-запроса
     rating_value = int(request.POST.get("rating"))
 
     # Создание/обновление оценки
     rating_obj, created = RecipeRating.objects.update_or_create(
-        user=request.user, recipe=recipe,
-        defaults={"rating": rating_value}
+        user=request.user, recipe=recipe, defaults={"rating": rating_value}
     )
 
     # Перенаправление на страницу рецепта
-    return redirect('recipe_detail', pk=recipe.pk)
+    return redirect("recipe_detail", pk=recipe.pk)
 
 
 @login_required
@@ -218,14 +233,16 @@ def add_to_favorites(request, pk):
     """Обработка AJAX-запроса для добавления/удаления рецепта из избранного
     с проверкой на авторизованность и авторство"""
     recipe = get_object_or_404(Recipe, pk=pk)
-    
+
     # Автор не может сохранить свой рецепт
-    if recipe.author == request.user :
-        return JsonResponse({
-            "status": "error",
-            "message": "Вы не можете добавить свой рецепт в избранное."
-        }) 
-        
+    if recipe.author == request.user:
+        return JsonResponse(
+            {
+                "status": "error",
+                "message": "Вы не можете добавить свой рецепт в избранное.",
+            }
+        )
+
     favorite, created = Favorite.objects.get_or_create(user=request.user, recipe=recipe)
 
     if not created:
@@ -239,6 +256,7 @@ def add_to_favorites(request, pk):
 class UserProfileView(DetailView):
     """Публичный профиль пользователя с возможностью
     фильтрации опубликованных рецептов по категориям"""
+
     model = User
     template_name = "user_profile.html"
     context_object_name = "user"
@@ -267,7 +285,8 @@ class UserProfileView(DetailView):
 
 class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """Редактирования профиля в ЛК;
-    доступно только владельцу аккаунта, никнейм неизменяем """
+    доступно только владельцу аккаунта, никнейм неизменяем"""
+
     model = User
     form_class = SignUpForm
     template_name = "account/edit_account.html"
@@ -300,15 +319,14 @@ class ProfileUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def get_success_url(self):
         """После успешного редактирования профиля - возврат в ЛК"""
-        return reverse_lazy("account", kwargs={
-            "nickname": self.request.user.nickname})
+        return reverse_lazy("account", kwargs={"nickname": self.request.user.nickname})
 
 
 @login_required
 def profile_view(request, nickname):
-    """"Личный кабинет пользователя"""
+    """ "Личный кабинет пользователя"""
     profile_user = get_object_or_404(User, nickname=nickname)
-    
+
     # Проверка: зашел ли пользователь в свой кабинет
     # В случае исключения ⭢ переход на страницу 403.html
     if request.user.nickname != nickname:
@@ -318,8 +336,9 @@ def profile_view(request, nickname):
     my_recipes = Recipe.objects.filter(author=profile_user).order_by("-created_at")[:4]
 
     # Избранные рецепты (последние 4)
-    favorite_recipes = Recipe.objects.filter(
-        favorite__user=profile_user).order_by("-favorite__created_at")[:4]
+    favorite_recipes = Recipe.objects.filter(favorite__user=profile_user).order_by(
+        "-favorite__created_at"
+    )[:4]
 
     context = {
         "profile_user": profile_user,
@@ -329,6 +348,7 @@ def profile_view(request, nickname):
 
     return render(request, "account/personal_account.html", context)
 
+
 @login_required
 def delete_account(request):
     """Удаление аккаунта через POST-запрос, AJAX не перегружает страницу"""
@@ -337,15 +357,17 @@ def delete_account(request):
         return JsonResponse({"success": True})
     return JsonResponse({"success": False}, status=400)
 
+
 class FavoritesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Избранные рецепты пользователя с фильтрацией по категориям"""
+
     model = Recipe
     template_name = "account/favorites.html"
     context_object_name = "recipes"
     paginate_by = 8
-    
+
     raise_exception = True  # Залогиненного пользователя переносят на ошибку 403
-    
+
     def test_func(self):
         """Только владелец профиля может просматривать избранное"""
         profile_user = get_object_or_404(User, nickname=self.kwargs.get("nickname"))
@@ -357,8 +379,9 @@ class FavoritesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         profile_user = get_object_or_404(User, nickname=nickname)
 
         # Все сохраненные рецепты
-        queryset = Recipe.objects.filter(
-            favorite__user=profile_user).order_by("-favorite__created_at")
+        queryset = Recipe.objects.filter(favorite__user=profile_user).order_by(
+            "-favorite__created_at"
+        )
 
         # Фильтрацию по категориям через GET-запрос
         category_id = self.request.GET.get("category")
@@ -380,13 +403,14 @@ class FavoritesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 
 class MyRecipesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     """Опубликованные рецепты пользователя с фильтрацией по категориям"""
+
     model = Recipe
     template_name = "account/my_recipes.html"
     context_object_name = "recipes"
     paginate_by = 8
-    
+
     raise_exception = True  # Залогиненного пользователя переносят на ошибку 403
-    
+
     def test_func(self):
         """Только владелец профиля может просматривать избранное"""
         profile_user = get_object_or_404(User, nickname=self.kwargs.get("nickname"))
@@ -423,6 +447,7 @@ class MyRecipesListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
 import secrets
 
 verification_codes = {}
+
 
 def generate_verification_code():
     """Генерация 6-значного кода"""
@@ -484,6 +509,7 @@ def delete_verification_data(email):
 
 class SignUpView(View):
     """Регистрация нового пользователя с подтверждением email-а"""
+
     def get(self, request):
         form = SignUpForm()
         return render(request, "auth/signup.html", {"form": form})
@@ -499,7 +525,7 @@ class SignUpView(View):
             send_mail(
                 subject="Подтверждение регистрации",
                 message=f"Ваш код подтверждения: {code}."
-                        f" Код действителен в течение 5 минут.",
+                f" Код действителен в течение 5 минут.",
                 from_email="noreply@recipesite.com",
                 recipient_list=[email],
             )
@@ -512,6 +538,7 @@ class SignUpView(View):
 
 class VerifyEmailView(View):
     """Проверка введённого кода для подтверждения email-а"""
+
     def get(self, request, email):
         """Отображение страницы для ввода кода"""
         return render(request, "auth/verify_email.html", {"email": email})
@@ -519,7 +546,9 @@ class VerifyEmailView(View):
     def post(self, request, email):
         """Обработка введенного кода и создание пользователя в случае совпадения"""
         entered_code = request.POST.get("code")
-        stored_data, saved_code = load_verification_data(email)  # Получение кода и данных из Redis
+        stored_data, saved_code = load_verification_data(
+            email
+        )  # Получение кода и данных из Redis
 
         # Проверка наличия формы
         if not stored_data:
@@ -530,24 +559,29 @@ class VerifyEmailView(View):
                 except Exception as e:
                     print(f"Ошибка при удалении временного аватара: {e}")
 
-            return JsonResponse({
-                "success": False,
-                "error": "Данные формы не найдены. Попробуйте зарегестрироваться снова."
-            })
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Данные формы не найдены. Попробуйте зарегестрироваться снова.",
+                }
+            )
 
         form_data = stored_data.get("form_data", {})
 
         # Проверка наличия кода
         if not saved_code:
-            return JsonResponse({
-                "success": False,
-                "error": "Срок действия кода истек. Запросите новый."})
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Срок действия кода истек. Запросите новый.",
+                }
+            )
 
         # Проверка совпадения кодов
         if entered_code != saved_code:
-            return JsonResponse({
-                "success": False,
-                "error": "Неверный код. Попробуйте еще раз."})
+            return JsonResponse(
+                {"success": False, "error": "Неверный код. Попробуйте еще раз."}
+            )
 
         # Создание пользователя с основными полями, без аватара
         # create_user хэширует пароль и сохраняет объект в базе
@@ -555,22 +589,27 @@ class VerifyEmailView(View):
             email=form_data["email"],
             nickname=form_data["nickname"],
             bio=form_data.get("bio", ""),
-            password=form_data["password1"]
+            password=form_data["password1"],
         )
         # Удаляем данные формы и код из Redis
         delete_verification_data(email)
 
         return JsonResponse({"success": True})
 
+
 class ResendCodeView(View):
     """Повторная отправка кода подтверждения по истечении 5 минут"""
+
     def post(self, request, email):
         form_data = cache.get(f"form:{email}")
 
         if not form_data:
-            return JsonResponse({
-                "success": False,
-                "error": "Данные формы не найдены. Попробуйте зарегестрироваться снова."})
+            return JsonResponse(
+                {
+                    "success": False,
+                    "error": "Данные формы не найдены. Попробуйте зарегестрироваться снова.",
+                }
+            )
 
         # Генерация нового кода и обновления Redis (форма остается)
         code = save_verification_data(email, form_data["form_data"], code_expiry=300)
@@ -578,15 +617,17 @@ class ResendCodeView(View):
         send_mail(
             subject="Подтверждение регистрации",
             message=f"Ваш код подтверждения: {code}."
-                    f" Код действителен в течение 5 минут.",
+            f" Код действителен в течение 5 минут.",
             from_email="noreply@recipesite.com",
             recipient_list=[email],
         )
 
-        return JsonResponse({
-            "success": True,
-            "message": "",
-        })
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "",
+            }
+        )
 
 
 # Вьюхи для проверки уникальности никнейма и email-а на фронте
@@ -594,6 +635,7 @@ def check_nickname(request):
     nickname = request.GET.get("nickname", "").strip()
     exists = User.objects.filter(nickname__iexact=nickname).exists()
     return JsonResponse({"exists": exists})
+
 
 def check_email(request):
     email = request.GET.get("email", "").strip()
@@ -603,6 +645,7 @@ def check_email(request):
 
 class CustomPasswordResetView(PasswordResetView):
     """Отправка ссылки на сброс пароля"""
+
     email_template_name = "auth/password_reset_email.html"
     subject_template_name = "auth/password_reset_subject.txt"
     success_url = reverse_lazy("login")  # Перенаправляем после успешного сброса пароля
@@ -612,9 +655,7 @@ class CustomPasswordResetView(PasswordResetView):
         email = request.POST.get("email")
 
         if not email:
-            return JsonResponse({
-                "success": False,
-                "error": "Введите email"})
+            return JsonResponse({"success": False, "error": "Введите email"})
 
         # Проверка на существование пользователя с таким email в БД
         # Возвращаем успех даже если  пользователя с таким email не существует
@@ -630,17 +671,18 @@ class CustomPasswordResetView(PasswordResetView):
 class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     template_name = "auth/password_reset_confirm.html"
     success_url = reverse_lazy("login")
-    
+
 
 def tr_handler403(request, exception):
     """Обработка ошибки 403"""
     return render(request=request, template_name="errors/403.html", status=403)
 
+
 def tr_handler404(request, exception):
     """Обработка ошибки 404"""
     return render(request=request, template_name="errors/404.html", status=404)
 
+
 def tr_handler500(request):
     """Обработка ошибки 500"""
     return render(request=request, template_name="errors/500.html", status=500)
-    

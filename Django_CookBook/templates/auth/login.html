@@ -15,19 +15,16 @@
 
         <span class="citation">«Рады видеть вас снова!»</span>
 
-        <!-- Левая часть с изображением -->
         <div class="left">
             <img src="{% static 'pictures/login.png' %}" alt="Вход">
         </div>
 
-        <!-- Правая часть: форма входа -->
         <div class="form-box">
             <h2 class="form-title">Вход</h2>
 
             <form method="post">
                 {% csrf_token %}
 
-                <!-- Ошибки формы -->
                 {% if form.errors %}
                     <div class="form-error" role="alert" aria-live="polite">
                         <strong>Ошибка входа:</strong> проверьте правильность введённых данных.
@@ -41,7 +38,6 @@
                     value="{{ form.username.value|default:'' }}">
                 </div>
 
-                <!-- Пароль с глазиком -->
                 <div class="form-group" style="position: relative;">
                     <label for="id_password" class="form-label">Пароль</label>
                     <input type="password" name="password" id="id_password"
@@ -62,7 +58,6 @@
     </div>
 </div>
 
-<!-- Модальное окно с уведомлением об отправке ссылки на сброс пароля -->
 <div id="resetModal" class="modal" style="display:none;">
   <div class="modal-content">
     <p id="resetMessage"></p>
@@ -71,7 +66,6 @@
 </div>
 
 <script>
-    // ----- Функция для переключения видимости пароля -----
     function togglePassword() {
         const passwordInput = document.getElementById('id_password');
         const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';

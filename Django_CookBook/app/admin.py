@@ -7,6 +7,7 @@ class RecipeRatingInline(admin.TabularInline):
     model = RecipeRating
     extra = 1
 
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     model = User
@@ -24,18 +25,28 @@ class UserAdmin(BaseUserAdmin):
     def has_delete_permission(self, request, obj=None):
         return False
 
+
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'dish_name', 'text', 'author', 'category', 'created_at', 'average_rating')
-    list_filter = ('category', 'created_at')
-    search_fields = ('dish_name', 'description', 'author__email')
-    readonly_fields = ('created_at', 'updated_at')
+    list_display = (
+        "id",
+        "dish_name",
+        "text",
+        "author",
+        "category",
+        "created_at",
+        "average_rating",
+    )
+    list_filter = ("category", "created_at")
+    search_fields = ("dish_name", "description", "author__email")
+    readonly_fields = ("created_at", "updated_at")
     inlines = [RecipeRatingInline]
 
     def average_rating(self, obj):
         return obj.average_rating()
 
-    average_rating.short_description = 'Средний рейтинг'
+    average_rating.short_description = "Средний рейтинг"
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
