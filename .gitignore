@@ -1,8 +1,6 @@
-venv_cb/
+venv/
 __pycache__/
-media/
 *.pyc
-*.sqlite3
 .env
 .DS_Store
 *.log
