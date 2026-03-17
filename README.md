@@ -1,4 +1,5 @@
-# Django CookBook
+# Django CookBook <img width="75" height="75" alt="file_type_django_icon_130645" src="https://github.com/user-attachments/assets/607b7754-31ba-45f7-9297-d767278d627b" />
+
 **CookBook** - это веб-приложение на Django для публикации кулинарных рецептов, их оценки и взаимодействия пользователей через систему избранного и рейтингов.
 
 
